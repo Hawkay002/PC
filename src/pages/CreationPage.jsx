@@ -3,7 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import imageCompression from 'browser-image-compression';
 import Cropper from 'react-easy-crop';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Send, Loader2, CheckCircle2, Copy, ArrowRight, ArrowLeft, Inbox, Upload, Camera } from 'lucide-react';
+import { Send, Loader2, Check, Copy, ArrowRight, ArrowLeft, Inbox, Upload, Camera } from 'lucide-react';
 import clsx from 'clsx';
 import Postcard from '../components/Postcard';
 import { createPostcard } from '../lib/supabase';
