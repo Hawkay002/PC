@@ -137,15 +137,9 @@ export default function CreationPage() {
 
   return (
     <>
-      {/* 
-        CRITICAL LAYOUT FIX: 
-        h-[100dvh] + overflow-hidden prevents ANY outer page scroll on mobile devices.
-        flex-col forces internal items to respect boundaries. 
-      */}
       <div className="bg-[#FDFBF7] h-[100dvh] overflow-hidden flex flex-col">
         <div className="max-w-7xl mx-auto w-full h-full p-4 lg:p-8 flex flex-col lg:flex-row gap-4 lg:gap-8 relative">
           
-          {/* --- LEFT: Fixed Preview Container --- */}
           <div className="w-full lg:w-[45%] shrink-0 flex flex-col items-center z-20 pb-2 border-b lg:border-none border-ink/5">
             <div className="w-full flex items-center justify-between mb-4 lg:mb-8 px-2">
               <h1 className="font-serif text-2xl font-bold text-ink">Postcard Studio</h1>
@@ -160,11 +154,8 @@ export default function CreationPage() {
             />
           </div>
 
-          {/* --- RIGHT: Bounded Form Container --- */}
-          {/* flex-1 min-h-0 makes it exactly fill the remaining height and no more */}
           <div className="w-full lg:w-[55%] bg-white rounded-xl shadow-sm border border-ink/5 p-4 sm:p-6 relative z-0 flex flex-col flex-1 min-h-0">
             
-            {/* Pinned Header */}
             <div className="shrink-0 flex items-center justify-between mb-4 border-b border-ink/5 pb-4">
               {[1, 2, 3, 4].map((num) => (
                 <div key={num} className={clsx(
@@ -176,7 +167,6 @@ export default function CreationPage() {
               ))}
             </div>
 
-            {/* Inner Scrollable Content */}
             <div className="flex-1 overflow-y-auto scrollbar-thin pr-2">
               {currentStep === 1 && (
                 <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="space-y-6 pt-2 pb-4">
@@ -247,7 +237,6 @@ export default function CreationPage() {
               )}
             </div>
 
-            {/* Pinned Footer Navigation */}
             <div className="shrink-0 pt-4 mt-2 flex items-center justify-between border-t border-ink/5">
               {currentStep > 1 ? (
                 <button type="button" onClick={() => setCurrentStep(prev => prev - 1)} className="px-6 py-3 font-semibold text-ink/60 hover:text-ink flex items-center gap-2">
@@ -306,9 +295,10 @@ export default function CreationPage() {
           <motion.div 
             key="animation-overlay"
             initial={{ opacity: 0 }} animate={{ opacity: 1 }}
-            className="fixed inset-0 z-50 flex items-center justify-center bg-[#FDFBF7] p-4 overflow-hidden"
+            className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-[#FDFBF7] p-4 overflow-hidden"
           >
-            <div className="relative w-full max-w-lg aspect-[3/2] perspective-1000 mt-24">
+            {/* Added mb-32 so it sits perfectly above the modal on all viewports */}
+            <div className="relative w-full max-w-lg aspect-[3/2] perspective-1000 mb-32">
               
               <motion.div 
                 className="absolute inset-0 bg-[#EAE5DC] shadow-envelope rounded-md border border-ink/10"
@@ -335,7 +325,8 @@ export default function CreationPage() {
                 initial={{ y: '-100vh' }} animate={{ y: packStep >= 1 ? 0 : '-100vh' }}
                 transition={{ type: "spring", stiffness: 40, damping: 15 }}
               >
-                <svg viewBox="0 0 540 360" className="w-full h-full">
+                {/* SVG aspect lock ensures it matches the bg-[#EAE5DC] div perfectly */}
+                <svg viewBox="0 0 540 360" preserveAspectRatio="none" className="w-full h-full rounded-b-md overflow-hidden">
                   <path d="M0,0 L270,220 L540,0 L540,360 L0,360 Z" fill="#F4F1EB" stroke="rgba(0,0,0,0.05)" strokeWidth="1" />
                   <path d="M0,360 L270,220 L540,360" fill="none" stroke="rgba(0,0,0,0.03)" strokeWidth="2" />
                 </svg>
@@ -351,12 +342,12 @@ export default function CreationPage() {
                 }}
                 transition={{ duration: 0.8, ease: "easeInOut" }}
               >
-                <svg viewBox="0 0 540 360" className="w-full h-full">
+                <svg viewBox="0 0 540 360" preserveAspectRatio="none" className="w-full h-full rounded-t-md">
                   <path d="M0,0 L270,230 L540,0 Z" fill="#F4F1EB" stroke="rgba(0,0,0,0.08)" strokeWidth="1"/>
                 </svg>
               </motion.div>
 
-              {/* The Wax Seal applied during creation (Fades in at step 6) */}
+              {/* Final Seal Application */}
               <motion.img 
                 src="/seal-1.webp" 
                 alt="Wax Seal"
@@ -365,7 +356,6 @@ export default function CreationPage() {
                 animate={{ opacity: packStep >= 6 ? 1 : 0 }}
                 transition={{ duration: 0.5, ease: "easeIn" }}
               />
-
             </div>
 
             <motion.div 
