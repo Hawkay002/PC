@@ -3,108 +3,85 @@ import { useState, useRef } from 'react';
 import Postcard from './Postcard';
 
 export default function Envelope({ postcardData }) {
-  const [envelopeState, setEnvelopeState] = useState('sealed'); // sealed, opening, open
-  const [sealTaps, setSealTaps] = useState(0);
-  const audioRef = useRef(new Audio('/crack.mp3')); // Place a small crack SFX in your public folder
+  const [sealTaps, setSealTaps] = useState(0); // 0 to 4
+  const [step, setStep] = useState(0); // 0: sealed, 1: seal falls, 2: flap opens, 3: card up, 4: card rests
+  
+  const audioRef = useRef(new Audio('/crack.mp3')); // Place crack.mp3 in public folder
 
   const handleTapSeal = () => {
-    // Play sound on each tap
+    // Play sound
     audioRef.current.currentTime = 0;
-    audioRef.current.play().catch(e => console.log("Audio play blocked by browser"));
+    audioRef.current.play().catch(e => console.log("Audio blocked", e));
 
     if (sealTaps < 4) {
       setSealTaps(prev => prev + 1);
-    } else {
-      // 5th tap breaks it
-      setEnvelopeState('opening');
-      setTimeout(() => {
-        setEnvelopeState('open');
-      }, 800);
+    } else if (step === 0) {
+      // 5th tap sequence
+      setStep(1); // Seal falls
+      setTimeout(() => setStep(2), 600); // Flap opens
+      setTimeout(() => setStep(3), 1400); // Card slides UP out of envelope
+      setTimeout(() => setStep(4), 2200); // Card rests ON envelope
     }
   };
 
   return (
-    // Resized container for better mobile fit
-    <div className="relative flex items-center justify-center w-full max-w-[400px] h-[500px] perspective-1000">
+    // Sized to perfectly match max-w-lg (512px) card width
+    <div className="relative flex items-center justify-center w-full max-w-xl h-[600px] perspective-1000">
       
-      {/* The Envelope Body */}
-      <div className="absolute w-[340px] h-[230px] bg-[#F4F1EB] shadow-envelope rounded-md flex items-center justify-center border border-ink/10">
+      {/* The Envelope Body - No rounded top corners */}
+      <div className="absolute w-[540px] h-[360px] bg-[#F4F1EB] shadow-envelope flex items-center justify-center border border-ink/10 rounded-b-md">
         
         {/* The Postcard */}
         <motion.div
-          className="absolute z-10 w-[300px]"
-          initial={{ y: 20, scale: 0.95, opacity: 0, rotateZ: 0 }}
+          className="absolute w-[512px]" // Exact max-w-lg
+          initial={{ y: 20, zIndex: 10 }}
           animate={{
-            y: envelopeState === 'open' ? -160 : 20,
-            scale: envelopeState === 'open' ? 1.05 : 0.95,
-            opacity: envelopeState === 'sealed' ? 0 : 1,
-            zIndex: envelopeState === 'open' ? 40 : 10,
-            rotateZ: envelopeState === 'open' ? 360 : 0 // The Spin Animation
+            y: step < 3 ? 20 : (step === 3 ? -250 : 0),
+            zIndex: step === 4 ? 40 : 10,
+            rotateZ: step === 3 ? [0, -5, 5, 0] : 0, // Slight wiggle as it pulls out
           }}
-          transition={{ 
-            type: "spring", 
-            stiffness: 40, 
-            damping: 15, 
-            delay: envelopeState === 'open' ? 0.2 : 0 
-          }}
+          transition={{ type: "spring", stiffness: 40, damping: 12 }}
         >
           <Postcard 
             data={postcardData} 
-            isInteractive={envelopeState === 'open'} 
-            forceFlip={envelopeState !== 'open'} 
+            isInteractive={step === 4} 
+            forceFlip={step < 4} 
           />
         </motion.div>
 
-        {/* The Envelope Flap (Fixed SVG for clean lines) */}
+        {/* The Flap - Straight lines, no curves */}
         <motion.svg
-          className="absolute top-0 left-0 w-full h-[130px] z-30 origin-top drop-shadow-md"
-          viewBox="0 0 340 130"
+          className="absolute top-0 left-0 w-full h-[180px] z-30 origin-top drop-shadow-sm"
+          viewBox="0 0 540 180"
           initial={{ rotateX: 0 }}
-          animate={{ rotateX: envelopeState !== 'sealed' ? 180 : 0 }}
+          animate={{ rotateX: step >= 2 ? 180 : 0 }}
           transition={{ duration: 0.8, ease: "easeInOut" }}
         >
-          <path d="M0,0 L170,130 L340,0 Z" fill="#EAE5DC" stroke="rgba(44,42,41,0.05)" />
+          <path d="M0,0 L270,180 L540,0 Z" fill="#EAE5DC" stroke="rgba(44,42,41,0.05)" />
         </motion.svg>
 
-        {/* The Stamp/Wax Seal */}
+        {/* The WebP Seal */}
         <AnimatePresence>
-          {envelopeState === 'sealed' && (
+          {step <= 1 && (
             <motion.button
               onClick={handleTapSeal}
-              className="absolute top-[50%] left-1/2 -translate-x-1/2 -translate-y-1/2 z-40 cursor-pointer drop-shadow-xl"
-              initial={{ scale: 1, opacity: 1 }}
-              // Shake harder with every tap
-              animate={{ 
-                rotate: sealTaps > 0 ? [-5*sealTaps, 5*sealTaps, -5*sealTaps, 0] : 0,
-                scale: 1 + (sealTaps * 0.05) 
-              }}
-              exit={{ scale: 1.5, opacity: 0, filter: 'blur(10px)' }}
-              transition={{ duration: 0.3 }}
+              className="absolute top-[45%] left-1/2 -translate-x-1/2 -translate-y-1/2 z-40 cursor-pointer drop-shadow-xl"
+              animate={step === 1 ? { y: 200, opacity: 0 } : { scale: 1 + (sealTaps * 0.05) }}
+              transition={{ duration: step === 1 ? 0.6 : 0.2 }}
             >
-              {/* Replace with your custom stamp image */}
-              <div className="relative w-20 h-20">
-                <img 
-                  src="/seal.png" // Point this to your seal image in public/
-                  alt="Seal" 
-                  className="w-full h-full object-contain"
-                  onError={(e) => {
-                    // Fallback wax seal if image is missing
-                    e.target.style.display = 'none';
-                    e.target.parentElement.innerHTML = `<div class="w-16 h-16 bg-red-800 rounded-full border-2 border-white/20 shadow-lg flex items-center justify-center text-white/50 text-xs">Tap x5</div>`;
-                  }}
-                />
-                
-                {/* Visual cracks that appear based on taps */}
-                {sealTaps > 0 && <div className="absolute inset-0 bg-black/10 rounded-full" style={{ clipPath: `circle(${sealTaps * 15}% at 50% 50%)`}} />}
-              </div>
+              <img 
+                src={`/seal-${sealTaps + 1}.webp`} 
+                alt="Wax Seal" 
+                className="w-24 h-24 object-contain"
+              />
             </motion.button>
           )}
         </AnimatePresence>
 
         {/* The Front Pocket */}
         <div 
-          className="absolute bottom-0 left-0 w-full h-2/3 bg-[#F4F1EB] rounded-b-md z-20 border-t border-white/50"
-          style={{ clipPath: 'polygon(0 100%, 100% 100%, 100% 0, 50% 30%, 0 0)' }}
+          className="absolute bottom-0 left-0 w-full h-[240px] bg-[#F4F1EB] rounded-b-md z-20 border-t border-white/50"
+          style={{ clipPath: 'polygon(0 100%, 100% 100%, 100% 0, 50% 20%, 0 0)' }}
         />
         
       </div>
