@@ -1,16 +1,21 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Mail, Clock, ArrowRight, PenSquare } from 'lucide-react';
+import { Mail, Clock, ArrowRight, PenSquare, Trash2 } from 'lucide-react';
 
 export default function Dashboard() {
   const [postcards, setPostcards] = useState([]);
 
   useEffect(() => {
-    // Retrieve the auth-free dashboard data
     const saved = JSON.parse(localStorage.getItem('my_postcards') || '[]');
-    // Sort newest first
     setPostcards(saved.sort((a, b) => new Date(b.date) - new Date(a.date)));
   }, []);
+
+  const handleDelete = (id) => {
+    if (!window.confirm("Delete this postcard from your outbox?")) return;
+    const updated = postcards.filter(card => card.id !== id);
+    setPostcards(updated);
+    localStorage.setItem('my_postcards', JSON.stringify(updated));
+  };
 
   return (
     <div className="max-w-3xl mx-auto p-6 lg:p-12 min-h-screen flex flex-col">
@@ -19,7 +24,7 @@ export default function Dashboard() {
           <h1 className="font-serif text-4xl font-bold text-ink">Your Outbox</h1>
           <p className="text-ink/60 mt-2 font-sans">Postcards saved locally on this device.</p>
         </div>
-        <Link to="/" className="bg-ink text-white px-5 py-2.5 rounded-lg font-semibold flex items-center gap-2 hover:bg-ink/90 transition-colors">
+        <Link to="/" className="bg-ink text-white px-5 py-2.5 rounded-lg font-semibold flex items-center gap-2 hover:bg-ink/90 transition-colors shadow-sm">
           <PenSquare className="w-4 h-4" />
           Draft New
         </Link>
@@ -37,9 +42,7 @@ export default function Dashboard() {
           {postcards.map((card) => (
             <div key={card.id} className="bg-white p-5 rounded-xl border border-ink/5 shadow-sm flex items-center justify-between group hover:border-pastel-blue transition-colors">
               <div className="flex items-center gap-4">
-                <div className="w-10 h-10 bg-pastel-pink/30 rounded-full flex items-center justify-center text-xl">
-                  💌
-                </div>
+                <div className="w-10 h-10 bg-pastel-pink/30 rounded-full flex items-center justify-center text-xl">💌</div>
                 <div>
                   <h3 className="font-semibold text-ink">To: {card.to}</h3>
                   <div className="flex items-center gap-1 text-xs text-ink/50 mt-1">
@@ -50,6 +53,12 @@ export default function Dashboard() {
               </div>
               
               <div className="flex items-center gap-3">
+                <button 
+                  onClick={() => handleDelete(card.id)}
+                  className="w-10 h-10 flex items-center justify-center text-red-500/50 hover:text-red-600 hover:bg-red-50 rounded-full transition-colors"
+                >
+                  <Trash2 className="w-4 h-4" />
+                </button>
                 <button 
                   onClick={() => {
                     navigator.clipboard.writeText(`${window.location.origin}/card/${card.id}`);
