@@ -1,24 +1,13 @@
 import { motion } from 'framer-motion';
-import { useState, useRef } from 'react';
-import { Camera, Upload } from 'lucide-react';
+import { useState } from 'react';
 
 export default function Postcard({ 
   data, 
   isInteractive = true, 
-  forceFlip = false,
-  onImageSelect 
+  forceFlip = false
 }) {
   const [isFlipped, setIsFlipped] = useState(false);
   const currentFlipState = isInteractive ? isFlipped : forceFlip;
-  
-  const fileInputRef = useRef(null);
-  const cameraInputRef = useRef(null);
-
-  const handleFileChange = (e) => {
-    if (e.target.files && e.target.files[0] && onImageSelect) {
-      onImageSelect(e.target.files[0]);
-    }
-  };
 
   return (
     <div 
@@ -37,7 +26,6 @@ export default function Postcard({
             Postcard
           </div>
           
-          {/* RESTORED BLENDING: mix-blend-multiply added back */}
           <div className="w-1/2 flex items-center justify-center bg-pastel-blue/5 p-2 relative">
              {data?.decoration ? (
                <img src={data.decoration} alt="Decoration" className="w-full h-full object-contain mix-blend-multiply drop-shadow-sm" />
@@ -75,30 +63,8 @@ export default function Postcard({
               />
             </div>
           ) : (
-            <div 
-              className="flex-1 w-full border-2 border-dashed border-ink/20 rounded bg-white/40 flex flex-col items-center justify-center gap-6"
-              onClick={(e) => e.stopPropagation()} 
-            >
-              <p className="text-sm font-sans text-ink/60">Add a photo to the back</p>
-              <div className="flex gap-4">
-                <button 
-                  type="button"
-                  onClick={() => fileInputRef.current?.click()}
-                  className="flex items-center gap-2 bg-white/80 border border-ink/10 hover:bg-white text-ink px-4 py-2 rounded-full transition-colors text-sm font-medium shadow-sm"
-                >
-                  <Upload className="w-4 h-4" /> Upload
-                </button>
-                <input type="file" ref={fileInputRef} accept="image/*" className="hidden" onChange={handleFileChange} />
-
-                <button 
-                  type="button"
-                  onClick={() => cameraInputRef.current?.click()}
-                  className="flex items-center gap-2 bg-white/80 border border-ink/10 hover:bg-white text-ink px-4 py-2 rounded-full transition-colors text-sm font-medium shadow-sm"
-                >
-                  <Camera className="w-4 h-4" /> Camera
-                </button>
-                <input type="file" ref={cameraInputRef} accept="image/*" capture="environment" className="hidden" onChange={handleFileChange} />
-              </div>
+            <div className="flex-1 w-full border-2 border-dashed border-ink/20 rounded bg-white/40 flex flex-col items-center justify-center p-6 text-center">
+              <p className="text-sm font-serif italic text-ink/60">Add a photo to the back</p>
             </div>
           )}
         </div>
