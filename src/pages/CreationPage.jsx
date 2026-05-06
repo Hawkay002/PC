@@ -1,14 +1,46 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import imageCompression from 'browser-image-compression';
-import { v4 as uuidv4 } from 'uuid';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Send, Loader2, CheckCircle2, Copy } from 'lucide-react';
+import clsx from 'clsx';
 import Postcard from '../components/Postcard';
 import { createPostcard } from '../lib/supabase';
-import { ImagePlus, Send, Loader2 } from 'lucide-react';
+
+// --- Assets Configuration ---
+// Make sure to add these images to your /public/flowers and /public/stamps folders
+const FLOWERS = [
+  { id: 'anemone', name: 'Japanese Anemone', img: '/flowers/anemone.png' },
+  { id: 'lily', name: 'Oriental Lily', img: '/flowers/lily.png' },
+  { id: 'sunflower', name: 'Sunflower', img: '/flowers/sunflower.png' },
+  { id: 'marigold', name: 'French Marigold', img: '/flowers/marigold.png' },
+  { id: 'magnolia', name: 'Magnolia Grandiflora', img: '/flowers/magnolia.png' },
+  { id: 'hibiscus', name: 'Scarlet Hibiscus', img: '/flowers/hibiscus.png' },
+  { id: 'daffodil', name: 'Daffodil', img: '/flowers/daffodil.png' },
+  { id: 'dicentra', name: 'Dicentra', img: '/flowers/dicentra.png' },
+  { id: 'wisteria', name: 'Wisteria', img: '/flowers/wisteria.png' },
+  { id: 'peony', name: 'Peony', img: '/flowers/peony.png' },
+  { id: 'carnation', name: 'Carnation', img: '/flowers/carnation.png' },
+  { id: 'iris', name: 'Bearded Iris', img: '/flowers/iris.png' },
+  { id: 'orchid', name: 'Orchid', img: '/flowers/orchid.png' },
+  { id: 'bird', name: 'Bird of Paradise', img: '/flowers/bird-of-paradise.png' },
+  { id: 'poppy', name: 'Red Poppy', img: '/flowers/poppy.png' },
+  { id: 'cosmos', name: 'Purple Cosmos', img: '/flowers/cosmos.png' }
+];
+
+const STAMPS = [
+  { id: 'stamp1', name: 'Classic Airmail', img: '/stamps/stamp1.png' },
+  { id: 'stamp2', name: 'Vintage Rose', img: '/stamps/stamp2.png' },
+  { id: 'stamp3', name: 'Gold Leaf', img: '/stamps/stamp3.png' },
+  { id: 'stamp4', name: 'Blue Ocean', img: '/stamps/stamp4.png' }
+];
 
 export default function CreationPage() {
   const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showSealingAnim, setShowSealingAnim] = useState(false);
+  const [generatedLink, setGeneratedLink] = useState('');
+  const [copied, setCopied] = useState(false);
   
   // Postcard State
   const [formData, setFormData] = useState({
@@ -16,41 +48,33 @@ export default function CreationPage() {
     from: '',
     message: '',
     font: 'script',
-    decoration: '🌸',
-    stamp: '💌',
+    decoration: FLOWERS[0].img, // Default to first flower
+    stamp: STAMPS[0].img,       // Default to first stamp
   });
   
   // Image State
   const [imageFile, setImageFile] = useState(null);
   const [previewUrl, setPreviewUrl] = useState('');
 
-  const handleImageChange = async (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-
-    // Create a fast local preview
-    setPreviewUrl(URL.createObjectURL(file));
-    setImageFile(file);
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!imageFile || !formData.message) return alert("Please add an image and a message!");
+    if (!imageFile) return alert("Please flip the card and add a photo!");
+    if (!formData.message) return alert("Please write a message!");
     
     setIsSubmitting(true);
     try {
-      // 1. Compress Image (Protecting Vercel's 4.5MB limit)
+      // 1. Compress Image
       const options = { maxSizeMB: 0.8, maxWidthOrHeight: 1200, useWebWorker: true };
       const compressedFile = await imageCompression(imageFile, options);
       
-      // 2. Convert to Base64 for the serverless proxy
+      // 2. Convert to Base64
       const base64 = await new Promise((resolve) => {
         const reader = new FileReader();
         reader.readAsDataURL(compressedFile);
         reader.onloadend = () => resolve(reader.result);
       });
 
-      // 3. Upload to Telegram via our API route
+      // 3. Upload to Telegram Proxy
       const uploadRes = await fetch('/api/upload', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -60,16 +84,17 @@ export default function CreationPage() {
       const uploadData = await uploadRes.json();
       if (!uploadRes.ok) throw new Error(uploadData.error);
 
-      // 4. Save metadata + file_id to Supabase
+      // 4. Save to Supabase
       const postcardId = await createPostcard({ ...formData, file_id: uploadData.file_id });
 
-      // 5. Save to local storage for the dashboard
+      // 5. Save locally for Dashboard
       const savedCards = JSON.parse(localStorage.getItem('my_postcards') || '[]');
       savedCards.push({ id: postcardId, to: formData.to, date: new Date().toISOString() });
       localStorage.setItem('my_postcards', JSON.stringify(savedCards));
 
-      // 6. Navigate to the generated link
-      navigate(`/card/${postcardId}`);
+      // 6. Trigger Sealing Animation instead of immediate navigation
+      setGeneratedLink(`${window.location.origin}/card/${postcardId}`);
+      setShowSealingAnim(true);
 
     } catch (error) {
       console.error(error);
@@ -79,71 +104,185 @@ export default function CreationPage() {
     }
   };
 
+  const handleCopyLink = () => {
+    navigator.clipboard.writeText(generatedLink);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
   return (
-    <div className="max-w-6xl mx-auto p-6 lg:p-12 grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
-      
-      {/* Left: The Live 3D Preview */}
-      <div className="sticky top-12 flex flex-col items-center">
-        <h2 className="text-sm font-sans font-semibold tracking-widest text-ink/50 uppercase mb-8">
-          Live Preview (Click to flip)
-        </h2>
-        <Postcard data={{ ...formData, previewUrl }} />
-      </div>
-
-      {/* Right: The Controls */}
-      <div className="bg-white rounded-xl shadow-sm border border-ink/5 p-8">
-        <h1 className="font-serif text-3xl font-bold mb-6">Craft your postcard</h1>
+    <>
+      <div className="max-w-6xl mx-auto p-6 lg:p-12 grid grid-cols-1 lg:grid-cols-2 gap-12 items-start h-screen">
         
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-xs font-semibold uppercase text-ink/60 mb-1">To</label>
-              <input 
-                type="text" required maxLength={30}
-                className="w-full bg-pastel-blue/10 border border-ink/10 rounded p-2 focus:outline-none focus:border-ink/30"
-                value={formData.to} onChange={e => setFormData({...formData, to: e.target.value})}
-              />
-            </div>
-            <div>
-              <label className="block text-xs font-semibold uppercase text-ink/60 mb-1">From</label>
-              <input 
-                type="text" required maxLength={30}
-                className="w-full bg-pastel-blue/10 border border-ink/10 rounded p-2 focus:outline-none focus:border-ink/30"
-                value={formData.from} onChange={e => setFormData({...formData, from: e.target.value})}
-              />
-            </div>
-          </div>
+        {/* Left: The Live 3D Preview (Sticky) */}
+        <div className="sticky top-12 flex flex-col items-center h-full pt-4">
+          <h2 className="text-sm font-sans font-semibold tracking-widest text-ink/50 uppercase mb-8">
+            Live Preview
+          </h2>
+          <Postcard 
+            data={{ ...formData, previewUrl }} 
+            onImageSelect={(file) => {
+              setPreviewUrl(URL.createObjectURL(file));
+              setImageFile(file);
+            }}
+          />
+          {!imageFile && (
+            <p className="mt-8 text-sm text-pastel-blue font-semibold animate-pulse">
+              Click the card to flip it and add your photo!
+            </p>
+          )}
+        </div>
 
-          <div>
-            <label className="block text-xs font-semibold uppercase text-ink/60 mb-1">Message</label>
-            <textarea 
-              required rows={4} maxLength={150}
-              className="w-full bg-pastel-blue/10 border border-ink/10 rounded p-2 focus:outline-none focus:border-ink/30 font-script text-xl resize-none"
-              value={formData.message} onChange={e => setFormData({...formData, message: e.target.value})}
-            />
-          </div>
-
-          <div className="border-t border-ink/10 pt-6">
-            <label className="block text-xs font-semibold uppercase text-ink/60 mb-3">Attach Photo</label>
-            <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-ink/20 rounded cursor-pointer hover:bg-pastel-blue/5 transition-colors">
-              <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                <ImagePlus className="w-8 h-8 text-ink/40 mb-2" />
-                <p className="text-sm text-ink/60 font-medium">Click to upload photo</p>
+        {/* Right: The Scrollable Controls */}
+        <div className="bg-white rounded-xl shadow-sm border border-ink/5 p-8 max-h-[85vh] overflow-y-auto scrollbar-thin scrollbar-thumb-ink/10 scrollbar-track-transparent">
+          <h1 className="font-serif text-4xl font-bold mb-8 text-ink">Craft your postcard</h1>
+          
+          <form onSubmit={handleSubmit} className="space-y-8">
+            {/* Text Inputs */}
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-xs font-semibold uppercase text-ink/60 mb-2">To</label>
+                <input 
+                  type="text" required maxLength={30} placeholder="Recipient Name"
+                  className="w-full bg-pastel-blue/5 border border-ink/10 rounded-md p-3 focus:outline-none focus:border-pastel-blue transition-colors"
+                  value={formData.to} onChange={e => setFormData({...formData, to: e.target.value})}
+                />
               </div>
-              <input type="file" accept="image/jpeg, image/png, image/webp" className="hidden" onChange={handleImageChange} required />
-            </label>
-          </div>
+              <div>
+                <label className="block text-xs font-semibold uppercase text-ink/60 mb-2">From</label>
+                <input 
+                  type="text" required maxLength={30} placeholder="Your Name"
+                  className="w-full bg-pastel-blue/5 border border-ink/10 rounded-md p-3 focus:outline-none focus:border-pastel-blue transition-colors"
+                  value={formData.from} onChange={e => setFormData({...formData, from: e.target.value})}
+                />
+              </div>
+            </div>
 
-          <button 
-            type="submit" 
-            disabled={isSubmitting}
-            className="w-full bg-ink text-white py-4 rounded-lg font-semibold flex items-center justify-center gap-2 hover:bg-ink/90 transition-colors disabled:opacity-50"
-          >
-            {isSubmitting ? <Loader2 className="animate-spin w-5 h-5" /> : <Send className="w-5 h-5" />}
-            {isSubmitting ? 'Sealing envelope...' : 'Send Postcard'}
-          </button>
-        </form>
+            <div>
+              <label className="block text-xs font-semibold uppercase text-ink/60 mb-2">Message</label>
+              <textarea 
+                required rows={5} maxLength={200} placeholder="Write something lovely..."
+                className="w-full bg-pastel-blue/5 border border-ink/10 rounded-md p-3 focus:outline-none focus:border-pastel-blue font-script text-2xl resize-none transition-colors"
+                value={formData.message} onChange={e => setFormData({...formData, message: e.target.value})}
+              />
+            </div>
+
+            {/* Stamp Selector */}
+            <div className="border-t border-ink/5 pt-6">
+              <label className="block text-xs font-semibold uppercase text-ink/60 mb-4">Select Stamp</label>
+              <div className="grid grid-cols-4 gap-3">
+                {STAMPS.map((stamp) => (
+                  <button
+                    key={stamp.id}
+                    type="button"
+                    onClick={() => setFormData({...formData, stamp: stamp.img})}
+                    className={clsx(
+                      "flex flex-col items-center p-2 rounded-lg border-2 transition-all",
+                      formData.stamp === stamp.img ? "border-pastel-blue bg-pastel-blue/5 shadow-sm" : "border-transparent hover:bg-gray-50"
+                    )}
+                  >
+                    <div className="w-10 h-12 bg-gray-100 shadow-sm border border-white mb-2 overflow-hidden">
+                      <img src={stamp.img} alt={stamp.name} className="w-full h-full object-cover" />
+                    </div>
+                    <span className="text-[10px] text-center leading-tight text-ink/70 font-medium">{stamp.name}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Decoration Selector */}
+            <div className="border-t border-ink/5 pt-6">
+              <label className="block text-xs font-semibold uppercase text-ink/60 mb-4">Select Flower Decoration</label>
+              <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
+                {FLOWERS.map((flower) => (
+                  <button
+                    key={flower.id}
+                    type="button"
+                    onClick={() => setFormData({...formData, decoration: flower.img})}
+                    className={clsx(
+                      "flex flex-col items-center p-3 rounded-lg border-2 transition-all",
+                      formData.decoration === flower.img ? "border-pastel-pink bg-pastel-pink/10 shadow-sm" : "border-transparent hover:bg-gray-50"
+                    )}
+                  >
+                    <img src={flower.img} alt={flower.name} className="w-12 h-12 object-contain mb-2 mix-blend-multiply" />
+                    <span className="text-[10px] text-center leading-tight text-ink/70 font-medium">{flower.name}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Submit */}
+            <div className="border-t border-ink/5 pt-8 pb-4">
+              <button 
+                type="submit" 
+                disabled={isSubmitting || !imageFile}
+                className="w-full bg-ink text-white py-4 rounded-lg font-semibold flex items-center justify-center gap-2 hover:bg-ink/90 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-md"
+              >
+                {isSubmitting ? <Loader2 className="animate-spin w-5 h-5" /> : <Send className="w-5 h-5" />}
+                {isSubmitting ? 'Sealing envelope...' : 'Send Postcard'}
+              </button>
+            </div>
+          </form>
+        </div>
       </div>
-    </div>
+
+      {/* --- The Post-Submission Sealing Animation Overlay --- */}
+      <AnimatePresence>
+        {showSealingAnim && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-white/60 backdrop-blur-md p-4"
+          >
+            <motion.div 
+              initial={{ scale: 0.8, y: 20 }}
+              animate={{ scale: 1, y: 0 }}
+              transition={{ type: "spring", stiffness: 50, damping: 15 }}
+              className="bg-white p-10 rounded-2xl shadow-envelope flex flex-col items-center text-center max-w-md w-full border border-ink/5 relative overflow-hidden"
+            >
+              {/* Decorative Wax Seal Background Element */}
+              <div className="absolute -top-12 -right-12 w-32 h-32 bg-pastel-pink/30 rounded-full blur-2xl" />
+              
+              <motion.div 
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                transition={{ delay: 0.3, type: "spring" }}
+                className="w-20 h-20 bg-[#8B0000] rounded-full flex items-center justify-center shadow-lg mb-6 border-4 border-white z-10"
+              >
+                <div className="w-14 h-14 border border-white/20 rounded-full flex items-center justify-center text-white/80 font-serif italic text-2xl">
+                  S
+                </div>
+              </motion.div>
+
+              <h2 className="font-serif text-3xl font-bold mb-2 text-ink">Signed & Sealed!</h2>
+              <p className="text-ink/60 mb-8 font-sans">Your postcard is ready to be delivered. Share the link below.</p>
+              
+              <div className="flex w-full gap-2 mb-8 relative z-10">
+                <input 
+                  type="text" 
+                  readOnly 
+                  value={generatedLink} 
+                  className="flex-1 bg-gray-50 border border-ink/10 rounded-lg px-4 py-3 text-sm outline-none text-ink/70 font-medium truncate"
+                />
+                <button 
+                  onClick={handleCopyLink}
+                  className="bg-ink text-white px-5 py-3 rounded-lg font-semibold hover:bg-ink/90 transition-colors flex items-center gap-2"
+                >
+                  {copied ? <CheckCircle2 className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+                  {copied ? 'Copied' : 'Copy'}
+                </button>
+              </div>
+              
+              <button 
+                onClick={() => navigate('/dashboard')}
+                className="text-sm font-semibold text-ink hover:text-pastel-blue transition-colors underline relative z-10"
+              >
+                Go to your Outbox
+              </button>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </>
   );
 }
