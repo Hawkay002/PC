@@ -9,7 +9,6 @@ import Postcard from '../components/Postcard';
 import { createPostcard } from '../lib/supabase';
 import getCroppedImg from '../utils/cropImage';
 
-// --- Assets Configuration ---
 const FLOWERS = [
   { id: 'anemone', name: 'Japanese Anemone', img: '/flowers/anemone.png' },
   { id: 'lily', name: 'Oriental Lily', img: '/flowers/lily.png' },
@@ -41,23 +40,18 @@ export default function CreationPage() {
   const fileInputRef = useRef(null);
   const cameraInputRef = useRef(null);
   
-  // Stepper State
   const [currentStep, setCurrentStep] = useState(1);
-  
-  // Global States
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showSealingAnim, setShowSealingAnim] = useState(false);
   const [generatedLink, setGeneratedLink] = useState('');
   const [copied, setCopied] = useState(false);
   const [packStep, setPackStep] = useState(0); 
 
-  // Form Data
   const [formData, setFormData] = useState({
     to: '', from: '', message: '', font: 'script',
     decoration: FLOWERS[0].img, stamp: STAMPS[0].img,       
   });
   
-  // Cropper & Image States
   const [imageFile, setImageFile] = useState(null);
   const [previewUrl, setPreviewUrl] = useState('');
   const [rawImageSrc, setRawImageSrc] = useState(null);
@@ -81,7 +75,7 @@ export default function CreationPage() {
       const croppedImageFile = await getCroppedImg(rawImageSrc, croppedAreaPixels);
       setPreviewUrl(URL.createObjectURL(croppedImageFile));
       setImageFile(croppedImageFile);
-      setRawImageSrc(null); // Close modal
+      setRawImageSrc(null); 
     } catch (e) {
       console.error(e);
     }
@@ -120,7 +114,6 @@ export default function CreationPage() {
       setGeneratedLink(`${window.location.origin}/card/${postcardId}`);
       setShowSealingAnim(true);
       
-      // Choreography
       setTimeout(() => setPackStep(1), 100);    
       setTimeout(() => setPackStep(2), 1200);   
       setTimeout(() => setPackStep(3), 2000);   
@@ -147,7 +140,7 @@ export default function CreationPage() {
       <div className="bg-[#FDFBF7] min-h-screen">
         <div className="max-w-7xl mx-auto p-4 lg:p-8 flex flex-col lg:flex-row gap-8 items-start relative">
           
-          {/* --- LEFT: Sticky Preview (Mobile & Desktop) --- */}
+          {/* --- LEFT: Sticky Preview --- */}
           <div className="w-full lg:w-[45%] sticky top-0 lg:top-8 bg-[#FDFBF7]/95 backdrop-blur-sm z-20 pb-4 pt-2 self-start flex flex-col items-center border-b lg:border-none border-ink/5">
             <div className="w-full flex items-center justify-between mb-4 lg:mb-8 px-2">
               <h1 className="font-serif text-2xl font-bold text-ink">Postcard Studio</h1>
@@ -163,9 +156,11 @@ export default function CreationPage() {
           </div>
 
           {/* --- RIGHT: Scrollable Stepper Form --- */}
-          <div className="w-full lg:w-[55%] bg-white rounded-xl shadow-sm border border-ink/5 p-6 relative z-0 flex flex-col h-[550px] lg:h-[650px] lg:mt-16">
+          {/* CRITICAL FIX: overflow-hidden on parent, flex-1 overflow-y-auto on child ensures pinned buttons */}
+          <div className="w-full lg:w-[55%] bg-white rounded-xl shadow-sm border border-ink/5 p-4 sm:p-6 relative z-0 flex flex-col h-[500px] lg:h-[650px] lg:mt-16 overflow-hidden">
             
-            <div className="shrink-0 flex items-center justify-between mb-6 border-b border-ink/5 pb-4">
+            {/* Header (Pinned) */}
+            <div className="shrink-0 flex items-center justify-between mb-4 border-b border-ink/5 pb-4">
               {[1, 2, 3, 4].map((num) => (
                 <div key={num} className={clsx(
                   "flex items-center justify-center w-8 h-8 rounded-full text-sm font-bold transition-colors",
@@ -176,9 +171,10 @@ export default function CreationPage() {
               ))}
             </div>
 
+            {/* Scrollable Content (Isolated Scroll) */}
             <div className="flex-1 overflow-y-auto scrollbar-thin pr-2">
               {currentStep === 1 && (
-                <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="space-y-6">
+                <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="space-y-6 pt-2 pb-4">
                   <h2 className="font-serif text-2xl text-ink">Write your message</h2>
                   <div className="grid grid-cols-2 gap-4">
                     <div>
@@ -198,7 +194,7 @@ export default function CreationPage() {
               )}
 
               {currentStep === 2 && (
-                <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="flex flex-col items-center justify-center py-12 space-y-8">
+                <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="flex flex-col items-center justify-center py-8 space-y-8">
                   <div className="text-center">
                     <h2 className="font-serif text-2xl text-ink mb-2">Attach a Memory</h2>
                     <p className="text-ink/60 text-sm">Upload a photo for the back of your postcard.</p>
@@ -218,7 +214,7 @@ export default function CreationPage() {
               )}
 
               {currentStep === 3 && (
-                <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="space-y-6">
+                <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="space-y-6 pt-2">
                   <h2 className="font-serif text-2xl text-ink">Choose a Stamp</h2>
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                     {STAMPS.map((stamp) => (
@@ -232,7 +228,7 @@ export default function CreationPage() {
               )}
 
               {currentStep === 4 && (
-                <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="space-y-6">
+                <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="space-y-6 pt-2 pb-4">
                   <h2 className="font-serif text-2xl text-ink">Add a Floral Touch</h2>
                   <div className="grid grid-cols-3 sm:grid-cols-4 gap-4">
                     {FLOWERS.map((flower) => (
@@ -246,7 +242,8 @@ export default function CreationPage() {
               )}
             </div>
 
-            <div className="shrink-0 pt-6 mt-4 flex items-center justify-between border-t border-ink/5">
+            {/* Footer Navigation (Pinned) */}
+            <div className="shrink-0 pt-4 mt-2 flex items-center justify-between border-t border-ink/5">
               {currentStep > 1 ? (
                 <button type="button" onClick={() => setCurrentStep(prev => prev - 1)} className="px-6 py-3 font-semibold text-ink/60 hover:text-ink flex items-center gap-2">
                   <ArrowLeft className="w-4 h-4" /> Back
@@ -258,9 +255,9 @@ export default function CreationPage() {
                   Next <ArrowRight className="w-4 h-4" />
                 </button>
               ) : (
-                <button type="button" onClick={submitPostcard} disabled={isSubmitting} className="bg-pastel-blue text-ink px-8 py-3 rounded-lg font-bold flex items-center gap-2 hover:brightness-95 disabled:opacity-50">
+                <button type="button" onClick={submitPostcard} disabled={isSubmitting} className="bg-pastel-blue text-ink px-6 sm:px-8 py-3 rounded-lg font-bold flex items-center gap-2 hover:brightness-95 disabled:opacity-50">
                   {isSubmitting ? <Loader2 className="animate-spin w-5 h-5" /> : <Send className="w-5 h-5" />}
-                  {isSubmitting ? 'Sealing...' : 'Send Postcard'}
+                  {isSubmitting ? 'Sealing...' : 'Send'}
                 </button>
               )}
             </div>
@@ -353,26 +350,39 @@ export default function CreationPage() {
                   <path d="M0,0 L270,230 L540,0 Z" fill="#F4F1EB" stroke="rgba(0,0,0,0.08)" strokeWidth="1"/>
                 </svg>
               </motion.div>
+
+              {/* The Wax Seal applied during creation (Fades in at step 6) */}
+              <motion.img 
+                src="/seal-1.webp" 
+                alt="Wax Seal"
+                className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-24 h-24 object-contain z-40"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: packStep >= 6 ? 1 : 0 }}
+                transition={{ duration: 0.5, ease: "easeIn" }}
+              />
+
             </div>
 
-            {/* CRASH-PROOF LINK MODAL: Uses CSS opacity instead of mounting/unmounting */}
+            {/* CRASH-PROOF LINK MODAL: Uses flexible layout to prevent breaking boundaries */}
             <motion.div 
-              className="absolute bottom-8 lg:bottom-12 z-[100] bg-white p-8 rounded-2xl shadow-[0_20px_60px_-15px_rgba(0,0,0,0.3)] flex flex-col items-center text-center max-w-md w-11/12 border border-ink/5"
-              animate={{ 
-                opacity: packStep >= 6 ? 1 : 0, 
-                y: packStep >= 6 ? 0 : 20 
-              }}
-              style={{
-                pointerEvents: packStep >= 6 ? 'auto' : 'none'
-              }}
+              className="absolute bottom-8 lg:bottom-12 z-[100] bg-white p-6 sm:p-8 rounded-2xl shadow-[0_20px_60px_-15px_rgba(0,0,0,0.3)] flex flex-col items-center text-center max-w-md w-11/12 border border-ink/5"
+              animate={{ opacity: packStep >= 6 ? 1 : 0, y: packStep >= 6 ? 0 : 20 }}
+              style={{ pointerEvents: packStep >= 6 ? 'auto' : 'none' }}
               transition={{ duration: 0.3 }}
             >
               <h2 className="font-serif text-3xl font-bold mb-2 text-ink">Signed & Sealed!</h2>
               <p className="text-ink/60 mb-6 font-sans">Share this unique link.</p>
               
-              <div className="flex w-full gap-2 mb-6 relative z-10">
-                <input type="text" readOnly value={generatedLink} className="flex-1 bg-gray-50 border border-ink/10 rounded-lg px-4 py-3 text-sm outline-none text-ink/70 truncate" />
-                <button onClick={handleCopyLink} className="bg-ink text-white px-5 py-3 rounded-lg font-semibold hover:bg-ink/90 flex items-center gap-2">
+              {/* FIXED UI: Flex-col on mobile, flex-row on desktop prevents overlap */}
+              <div className="flex flex-col sm:flex-row w-full gap-3 mb-6 relative z-10">
+                <input 
+                  type="text" readOnly value={generatedLink} 
+                  className="w-full sm:flex-1 bg-gray-50 border border-ink/10 rounded-lg px-4 py-3 text-center sm:text-left text-sm outline-none text-ink/70" 
+                />
+                <button 
+                  onClick={handleCopyLink} 
+                  className="w-full sm:w-auto bg-ink text-white px-6 py-3 rounded-lg font-semibold hover:bg-ink/90 flex items-center justify-center gap-2 shrink-0 transition-all"
+                >
                   {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />} {copied ? 'Copied' : 'Copy'}
                 </button>
               </div>
