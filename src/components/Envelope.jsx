@@ -43,26 +43,29 @@ export default function Envelope({ postcardData }) {
         <Postcard data={postcardData} isInteractive={step === 5} forceFlip={step < 5} />
       </motion.div>
 
-      {/* 3. The Front Pocket (Perfect SVG Mask) */}
-      <div className="absolute inset-0 w-full h-full z-20 pointer-events-none">
-        <svg viewBox="0 0 540 360" className="w-full h-full drop-shadow-sm">
-          {/* Draws the bottom pocket masking the sides entirely */}
-          <path d="M0,360 L540,360 L540,120 L270,240 L0,120 Z" fill="#F4F1EB" stroke="rgba(0,0,0,0.05)" strokeWidth="1" />
+      {/* 3. The Front Pocket (Classic V-Neck Envelope Geometry) */}
+      <div className="absolute inset-0 w-full h-full z-20 pointer-events-none drop-shadow-sm">
+        <svg viewBox="0 0 540 360" className="w-full h-full">
+          {/* Side and Bottom flaps combined into one seamless V-neck pocket */}
+          <path d="M0,0 L270,220 L540,0 L540,360 L0,360 Z" fill="#F4F1EB" stroke="rgba(0,0,0,0.05)" strokeWidth="1" />
+          {/* Subtle line to define the bottom flap overlapping the side flaps */}
+          <path d="M0,360 L270,220 L540,360" fill="none" stroke="rgba(0,0,0,0.03)" strokeWidth="2" />
         </svg>
       </div>
 
       {/* 4. The Top Flap */}
       <motion.div
-        className="absolute top-0 left-0 w-full h-[200px] origin-top drop-shadow-sm"
+        className="absolute top-0 left-0 w-full h-full origin-top drop-shadow-md"
         initial={{ rotateX: 0, zIndex: 30 }}
         animate={{ 
           rotateX: step >= 2 ? 180 : 0,
-          zIndex: step >= 3 ? 0 : 30 // RAPID Z-INDEX DROP so card clears the flap
+          zIndex: step >= 3 ? 0 : 30 // RAPID Z-INDEX DROP
         }}
         transition={{ duration: 0.8, ease: "easeInOut" }}
       >
-        <svg viewBox="0 0 540 200" className="w-full h-full">
-          <path d="M0,0 L270,160 L540,0 Z" fill="#F4F1EB" stroke="rgba(0,0,0,0.08)" strokeWidth="1"/>
+        <svg viewBox="0 0 540 360" className="w-full h-full">
+          {/* Perfect triangle that overlaps the V-neck */}
+          <path d="M0,0 L270,230 L540,0 Z" fill="#F4F1EB" stroke="rgba(0,0,0,0.08)" strokeWidth="1"/>
         </svg>
       </motion.div>
 
@@ -71,7 +74,7 @@ export default function Envelope({ postcardData }) {
         {step <= 1 && (
           <motion.button
             onClick={handleTapSeal}
-            className="absolute top-[45%] left-1/2 -translate-x-1/2 -translate-y-1/2 z-40 cursor-pointer drop-shadow-xl"
+            className="absolute top-[50%] left-1/2 -translate-x-1/2 -translate-y-1/2 z-40 cursor-pointer drop-shadow-xl"
             animate={step === 1 ? { y: 200, opacity: 0 } : { scale: 1 + (sealTaps * 0.05) }}
             transition={{ duration: step === 1 ? 0.6 : 0.2 }}
           >
