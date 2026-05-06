@@ -375,7 +375,7 @@ export default function CreationPage() {
                   <div className="flex w-full gap-2 mb-6 relative z-10">
                     <input type="text" readOnly value={generatedLink} className="flex-1 bg-gray-50 border border-ink/10 rounded-lg px-4 py-3 text-sm outline-none text-ink/70 truncate" />
                     <button onClick={handleCopyLink} className="bg-ink text-white px-5 py-3 rounded-lg font-semibold hover:bg-ink/90 flex items-center gap-2">
-                      {copied ? <CheckCircle2 className="w-4 h-4" /> : <Copy className="w-4 h-4" />} {copied ? 'Copied' : 'Copy'}
+                      {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />} {copied ? 'Copied' : 'Copy'}
                     </button>
                   </div>
                   <button onClick={() => navigate('/dashboard')} className="text-sm font-semibold text-ink underline hover:text-pastel-blue transition-colors">
