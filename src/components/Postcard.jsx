@@ -16,6 +16,7 @@ export default function Postcard({
     >
       <motion.div
         className="w-full h-full relative transition-shadow duration-500 rounded-lg shadow-card group-hover:shadow-envelope [transform-style:preserve-3d]"
+        initial={false} // CRITICAL FIX: Prevents the card from animating on initial page load
         animate={{ rotateY: currentFlipState ? 180 : 0 }}
         transition={{ type: 'spring', stiffness: 60, damping: 15 }} 
       >
