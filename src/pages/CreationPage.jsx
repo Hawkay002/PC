@@ -136,23 +136,25 @@ export default function CreationPage() {
     }
   };
 
+  const handleCopyLink = () => {
+    navigator.clipboard.writeText(generatedLink);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
   return (
     <>
-      {/* Background container */}
       <div className="bg-[#FDFBF7] min-h-screen">
         <div className="max-w-7xl mx-auto p-4 lg:p-8 flex flex-col lg:flex-row gap-8 items-start relative">
           
           {/* --- LEFT: Sticky Preview (Mobile & Desktop) --- */}
           <div className="w-full lg:w-[45%] sticky top-0 lg:top-8 bg-[#FDFBF7]/95 backdrop-blur-sm z-20 pb-4 pt-2 self-start flex flex-col items-center border-b lg:border-none border-ink/5">
-            
-            {/* Header & Outbox Link */}
             <div className="w-full flex items-center justify-between mb-4 lg:mb-8 px-2">
               <h1 className="font-serif text-2xl font-bold text-ink">Postcard Studio</h1>
               <Link to="/dashboard" className="flex items-center gap-2 text-sm font-semibold text-ink/60 hover:text-pastel-blue transition-colors bg-white px-4 py-2 rounded-full shadow-sm border border-ink/5">
                 <Inbox className="w-4 h-4" /> Outbox
               </Link>
             </div>
-
             <Postcard 
               data={{ ...formData, previewUrl }} 
               isInteractive={false}
@@ -163,7 +165,6 @@ export default function CreationPage() {
           {/* --- RIGHT: Scrollable Stepper Form --- */}
           <div className="w-full lg:w-[55%] bg-white rounded-xl shadow-sm border border-ink/5 p-6 relative z-0 flex flex-col h-[550px] lg:h-[650px] lg:mt-16">
             
-            {/* Fixed Stepper Header */}
             <div className="shrink-0 flex items-center justify-between mb-6 border-b border-ink/5 pb-4">
               {[1, 2, 3, 4].map((num) => (
                 <div key={num} className={clsx(
@@ -175,9 +176,7 @@ export default function CreationPage() {
               ))}
             </div>
 
-            {/* Scrollable Content Area */}
             <div className="flex-1 overflow-y-auto scrollbar-thin pr-2">
-              
               {currentStep === 1 && (
                 <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="space-y-6">
                   <h2 className="font-serif text-2xl text-ink">Write your message</h2>
@@ -204,19 +203,16 @@ export default function CreationPage() {
                     <h2 className="font-serif text-2xl text-ink mb-2">Attach a Memory</h2>
                     <p className="text-ink/60 text-sm">Upload a photo for the back of your postcard.</p>
                   </div>
-                  
                   <div className="flex flex-col sm:flex-row gap-4 w-full max-w-sm">
-                    <button onClick={() => fileInputRef.current?.click()} className="flex-1 flex items-center justify-center gap-2 bg-pastel-blue/10 hover:bg-pastel-blue/20 text-ink py-4 rounded-xl transition-colors font-medium border border-ink/5">
+                    <button type="button" onClick={() => fileInputRef.current?.click()} className="flex-1 flex items-center justify-center gap-2 bg-pastel-blue/10 hover:bg-pastel-blue/20 text-ink py-4 rounded-xl transition-colors font-medium border border-ink/5">
                       <Upload className="w-5 h-5" /> Upload File
                     </button>
                     <input type="file" ref={fileInputRef} className="hidden" accept="image/*" onChange={(e) => handleRawImageSelect(e.target.files[0])} />
-
-                    <button onClick={() => cameraInputRef.current?.click()} className="flex-1 flex items-center justify-center gap-2 bg-pastel-pink/10 hover:bg-pastel-pink/20 text-ink py-4 rounded-xl transition-colors font-medium border border-ink/5">
+                    <button type="button" onClick={() => cameraInputRef.current?.click()} className="flex-1 flex items-center justify-center gap-2 bg-pastel-pink/10 hover:bg-pastel-pink/20 text-ink py-4 rounded-xl transition-colors font-medium border border-ink/5">
                       <Camera className="w-5 h-5" /> Camera
                     </button>
                     <input type="file" ref={cameraInputRef} className="hidden" accept="image/*" capture="environment" onChange={(e) => handleRawImageSelect(e.target.files[0])} />
                   </div>
-
                   {imageFile && <span className="text-sm font-semibold text-pastel-blue">Photo successfully attached!</span>}
                 </motion.div>
               )}
@@ -250,7 +246,6 @@ export default function CreationPage() {
               )}
             </div>
 
-            {/* Fixed Footer Navigation */}
             <div className="shrink-0 pt-6 mt-4 flex items-center justify-between border-t border-ink/5">
               {currentStep > 1 ? (
                 <button type="button" onClick={() => setCurrentStep(prev => prev - 1)} className="px-6 py-3 font-semibold text-ink/60 hover:text-ink flex items-center gap-2">
@@ -269,7 +264,6 @@ export default function CreationPage() {
                 </button>
               )}
             </div>
-
           </div>
         </div>
       </div>
@@ -308,6 +302,7 @@ export default function CreationPage() {
       <AnimatePresence>
         {showSealingAnim && (
           <motion.div 
+            key="animation-overlay"
             initial={{ opacity: 0 }} animate={{ opacity: 1 }}
             className="fixed inset-0 z-50 flex items-center justify-center bg-[#FDFBF7] p-4 overflow-hidden"
           >
@@ -358,32 +353,34 @@ export default function CreationPage() {
                   <path d="M0,0 L270,230 L540,0 Z" fill="#F4F1EB" stroke="rgba(0,0,0,0.08)" strokeWidth="1"/>
                 </svg>
               </motion.div>
-
             </div>
 
-            {/* The Final Link UI (Fades in at step 6) */}
-            <AnimatePresence>
-              {packStep >= 6 && (
-                <motion.div 
-                  initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
-                  // ADDED: z-[100] ensures the modal renders completely above the envelope geometry
-                  className="absolute bottom-8 lg:bottom-12 z-[100] bg-white p-8 rounded-2xl shadow-[0_20px_60px_-15px_rgba(0,0,0,0.3)] flex flex-col items-center text-center max-w-md w-11/12 border border-ink/5"
-                >
-                  <h2 className="font-serif text-3xl font-bold mb-2 text-ink">Signed & Sealed!</h2>
-                  <p className="text-ink/60 mb-6 font-sans">Share this unique link.</p>
-                  
-                  <div className="flex w-full gap-2 mb-6 relative z-10">
-                    <input type="text" readOnly value={generatedLink} className="flex-1 bg-gray-50 border border-ink/10 rounded-lg px-4 py-3 text-sm outline-none text-ink/70 truncate" />
-                    <button onClick={handleCopyLink} className="bg-ink text-white px-5 py-3 rounded-lg font-semibold hover:bg-ink/90 flex items-center gap-2">
-                      {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />} {copied ? 'Copied' : 'Copy'}
-                    </button>
-                  </div>
-                  <button onClick={() => navigate('/dashboard')} className="text-sm font-semibold text-ink underline hover:text-pastel-blue transition-colors">
-                    Go to your Outbox
-                  </button>
-                </motion.div>
-              )}
-            </AnimatePresence>
+            {/* CRASH-PROOF LINK MODAL: Uses CSS opacity instead of mounting/unmounting */}
+            <motion.div 
+              className="absolute bottom-8 lg:bottom-12 z-[100] bg-white p-8 rounded-2xl shadow-[0_20px_60px_-15px_rgba(0,0,0,0.3)] flex flex-col items-center text-center max-w-md w-11/12 border border-ink/5"
+              animate={{ 
+                opacity: packStep >= 6 ? 1 : 0, 
+                y: packStep >= 6 ? 0 : 20 
+              }}
+              style={{
+                pointerEvents: packStep >= 6 ? 'auto' : 'none'
+              }}
+              transition={{ duration: 0.3 }}
+            >
+              <h2 className="font-serif text-3xl font-bold mb-2 text-ink">Signed & Sealed!</h2>
+              <p className="text-ink/60 mb-6 font-sans">Share this unique link.</p>
+              
+              <div className="flex w-full gap-2 mb-6 relative z-10">
+                <input type="text" readOnly value={generatedLink} className="flex-1 bg-gray-50 border border-ink/10 rounded-lg px-4 py-3 text-sm outline-none text-ink/70 truncate" />
+                <button onClick={handleCopyLink} className="bg-ink text-white px-5 py-3 rounded-lg font-semibold hover:bg-ink/90 flex items-center gap-2">
+                  {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />} {copied ? 'Copied' : 'Copy'}
+                </button>
+              </div>
+              <button onClick={() => navigate('/dashboard')} className="text-sm font-semibold text-ink underline hover:text-pastel-blue transition-colors">
+                Go to your Outbox
+              </button>
+            </motion.div>
+            
           </motion.div>
         )}
       </AnimatePresence>
