@@ -8,7 +8,6 @@ import Postcard from '../components/Postcard';
 import { createPostcard } from '../lib/supabase';
 
 // --- Assets Configuration ---
-// Make sure to add these images to your /public/flowers and /public/stamps folders
 const FLOWERS = [
   { id: 'anemone', name: 'Japanese Anemone', img: '/flowers/anemone.png' },
   { id: 'lily', name: 'Oriental Lily', img: '/flowers/lily.png' },
@@ -42,14 +41,17 @@ export default function CreationPage() {
   const [generatedLink, setGeneratedLink] = useState('');
   const [copied, setCopied] = useState(false);
   
+  // 7-Step Sequence State for the Packing Animation
+  const [packStep, setPackStep] = useState(0); 
+
   // Postcard State
   const [formData, setFormData] = useState({
     to: '',
     from: '',
     message: '',
     font: 'script',
-    decoration: FLOWERS[0].img, // Default to first flower
-    stamp: STAMPS[0].img,       // Default to first stamp
+    decoration: FLOWERS[0].img, 
+    stamp: STAMPS[0].img,       
   });
   
   // Image State
@@ -58,7 +60,7 @@ export default function CreationPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!imageFile) return alert("Please flip the card and add a photo!");
+    if (!imageFile) return alert("Please click the card to flip it and add a photo!");
     if (!formData.message) return alert("Please write a message!");
     
     setIsSubmitting(true);
@@ -92,9 +94,18 @@ export default function CreationPage() {
       savedCards.push({ id: postcardId, to: formData.to, date: new Date().toISOString() });
       localStorage.setItem('my_postcards', JSON.stringify(savedCards));
 
-      // 6. Trigger Sealing Animation instead of immediate navigation
+      // 6. Trigger Orchestration Overlay Sequence
       setGeneratedLink(`${window.location.origin}/card/${postcardId}`);
       setShowSealingAnim(true);
+      
+      // Sequence the steps
+      setTimeout(() => setPackStep(1), 100);    // Card centers
+      setTimeout(() => setPackStep(2), 1000);   // Envelope drops down
+      setTimeout(() => setPackStep(3), 1800);   // Flap opens
+      setTimeout(() => setPackStep(4), 2600);   // Card slides up
+      setTimeout(() => setPackStep(5), 3400);   // Card slides down into envelope
+      setTimeout(() => setPackStep(6), 4200);   // Flap closes
+      setTimeout(() => setPackStep(7), 5000);   // Link UI appears
 
     } catch (error) {
       console.error(error);
@@ -112,10 +123,10 @@ export default function CreationPage() {
 
   return (
     <>
-      <div className="max-w-7xl mx-auto p-4 lg:p-8 flex flex-col lg:flex-row gap-8 items-start min-h-screen">
+      <div className="max-w-7xl mx-auto p-4 lg:p-8 flex flex-col lg:flex-row gap-8 items-start min-h-screen relative">
         
-        {/* Left: The Live 3D Preview (Sticky on Desktop) */}
-        <div className="w-full lg:w-[45%] lg:sticky lg:top-12 flex flex-col items-center pt-4 z-10">
+        {/* --- LEFT: The Live 3D Preview (Sticky) --- */}
+        <div className="w-full lg:w-[45%] lg:sticky lg:top-12 self-start flex flex-col items-center pt-4 z-10">
           <Postcard 
             data={{ ...formData, previewUrl }} 
             onImageSelect={(file) => {
@@ -130,7 +141,7 @@ export default function CreationPage() {
           )}
         </div>
 
-        {/* Right: The Controls (Independent Scroll) */}
+        {/* --- RIGHT: The Scrollable Controls --- */}
         <div className="w-full lg:w-[55%] bg-white rounded-xl shadow-sm border border-ink/5 p-6 lg:p-8 relative z-0">
           <h1 className="font-serif text-3xl font-bold mb-8 text-ink">Craft your postcard</h1>
           
@@ -141,7 +152,7 @@ export default function CreationPage() {
                 <label className="block text-xs font-semibold uppercase text-ink/60 mb-2">To</label>
                 <input 
                   type="text" required maxLength={30} placeholder="Recipient Name"
-                  className="w-full bg-pastel-blue/5 border border-ink/10 rounded-md p-3 focus:outline-none focus:border-pastel-blue transition-colors"
+                  className="w-full bg-pastel-blue/5 border border-ink/10 rounded-md p-3 focus:outline-none focus:border-pastel-blue transition-colors text-ink"
                   value={formData.to} onChange={e => setFormData({...formData, to: e.target.value})}
                 />
               </div>
@@ -149,7 +160,7 @@ export default function CreationPage() {
                 <label className="block text-xs font-semibold uppercase text-ink/60 mb-2">From</label>
                 <input 
                   type="text" required maxLength={30} placeholder="Your Name"
-                  className="w-full bg-pastel-blue/5 border border-ink/10 rounded-md p-3 focus:outline-none focus:border-pastel-blue transition-colors"
+                  className="w-full bg-pastel-blue/5 border border-ink/10 rounded-md p-3 focus:outline-none focus:border-pastel-blue transition-colors text-ink"
                   value={formData.from} onChange={e => setFormData({...formData, from: e.target.value})}
                 />
               </div>
@@ -159,7 +170,7 @@ export default function CreationPage() {
               <label className="block text-xs font-semibold uppercase text-ink/60 mb-2">Message</label>
               <textarea 
                 required rows={5} maxLength={200} placeholder="Write something lovely..."
-                className="w-full bg-pastel-blue/5 border border-ink/10 rounded-md p-3 focus:outline-none focus:border-pastel-blue font-script text-2xl resize-none transition-colors"
+                className="w-full bg-pastel-blue/5 border border-ink/10 rounded-md p-3 focus:outline-none focus:border-pastel-blue font-script text-2xl resize-none transition-colors text-ink"
                 value={formData.message} onChange={e => setFormData({...formData, message: e.target.value})}
               />
             </div>
@@ -167,7 +178,7 @@ export default function CreationPage() {
             {/* Stamp Selector */}
             <div className="border-t border-ink/5 pt-6">
               <label className="block text-xs font-semibold uppercase text-ink/60 mb-4">Select Stamp</label>
-              <div className="grid grid-cols-4 gap-3">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                 {STAMPS.map((stamp) => (
                   <button
                     key={stamp.id}
@@ -201,7 +212,7 @@ export default function CreationPage() {
                       formData.decoration === flower.img ? "border-pastel-pink bg-pastel-pink/10 shadow-sm" : "border-transparent hover:bg-gray-50"
                     )}
                   >
-                    <img src={flower.img} alt={flower.name} className="w-12 h-12 object-contain mb-2 mix-blend-multiply" />
+                    <img src={flower.img} alt={flower.name} className="w-12 h-12 object-contain mb-2 drop-shadow-sm" />
                     <span className="text-[10px] text-center leading-tight text-ink/70 font-medium">{flower.name}</span>
                   </button>
                 ))}
@@ -223,60 +234,90 @@ export default function CreationPage() {
         </div>
       </div>
 
-      {/* --- The Post-Submission Sealing Animation Overlay --- */}
+      {/* --- THE FULL SCREEN ORCHESTRATION ANIMATION OVERLAY --- */}
       <AnimatePresence>
         {showSealingAnim && (
           <motion.div 
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="fixed inset-0 z-50 flex items-center justify-center bg-white/60 backdrop-blur-md p-4"
+            className="fixed inset-0 z-50 flex items-center justify-center bg-[#FDFBF7] p-4 overflow-hidden"
           >
-            <motion.div 
-              initial={{ scale: 0.8, y: 20 }}
-              animate={{ scale: 1, y: 0 }}
-              transition={{ type: "spring", stiffness: 50, damping: 15 }}
-              className="bg-white p-10 rounded-2xl shadow-envelope flex flex-col items-center text-center max-w-md w-full border border-ink/5 relative overflow-hidden"
-            >
-              {/* Decorative Wax Seal Background Element */}
-              <div className="absolute -top-12 -right-12 w-32 h-32 bg-pastel-pink/30 rounded-full blur-2xl" />
+            {/* The Orchestration Stage */}
+            <div className="relative flex items-center justify-center w-full max-w-xl h-[600px] perspective-1000">
               
+              {/* 1. Envelope Body (Starts off screen top) */}
               <motion.div 
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                transition={{ delay: 0.3, type: "spring" }}
-                className="w-20 h-20 bg-[#8B0000] rounded-full flex items-center justify-center shadow-lg mb-6 border-4 border-white z-10"
+                className="absolute w-[540px] h-[360px] bg-[#F4F1EB] shadow-envelope flex items-center justify-center border border-ink/10 rounded-b-md"
+                initial={{ y: '-100vh', zIndex: 0 }}
+                animate={{ y: packStep >= 2 ? 0 : '-100vh' }}
+                transition={{ type: "spring", stiffness: 40, damping: 15 }}
               >
-                <div className="w-14 h-14 border border-white/20 rounded-full flex items-center justify-center text-white/80 font-serif italic text-2xl">
-                  S
-                </div>
+                {/* Envelope Flap */}
+                <motion.svg
+                  className="absolute top-0 left-0 w-full h-[180px] z-30 origin-top drop-shadow-sm"
+                  viewBox="0 0 540 180"
+                  animate={{ rotateX: (packStep >= 3 && packStep < 6) ? 180 : 0 }}
+                  transition={{ duration: 0.8, ease: "easeInOut" }}
+                >
+                  <path d="M0,0 L270,180 L540,0 Z" fill="#EAE5DC" stroke="rgba(44,42,41,0.05)" />
+                </motion.svg>
+
+                {/* The Front Pocket */}
+                <div 
+                  className="absolute bottom-0 left-0 w-full h-[240px] bg-[#F4F1EB] rounded-b-md z-20 border-t border-white/50"
+                  style={{ clipPath: 'polygon(0 100%, 100% 100%, 100% 0, 50% 20%, 0 0)' }}
+                />
               </motion.div>
 
-              <h2 className="font-serif text-3xl font-bold mb-2 text-ink">Signed & Sealed!</h2>
-              <p className="text-ink/60 mb-8 font-sans">Your postcard is ready to be delivered. Share the link below.</p>
-              
-              <div className="flex w-full gap-2 mb-8 relative z-10">
-                <input 
-                  type="text" 
-                  readOnly 
-                  value={generatedLink} 
-                  className="flex-1 bg-gray-50 border border-ink/10 rounded-lg px-4 py-3 text-sm outline-none text-ink/70 font-medium truncate"
-                />
-                <button 
-                  onClick={handleCopyLink}
-                  className="bg-ink text-white px-5 py-3 rounded-lg font-semibold hover:bg-ink/90 transition-colors flex items-center gap-2"
-                >
-                  {copied ? <CheckCircle2 className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
-                  {copied ? 'Copied' : 'Copy'}
-                </button>
-              </div>
-              
-              <button 
-                onClick={() => navigate('/dashboard')}
-                className="text-sm font-semibold text-ink hover:text-pastel-blue transition-colors underline relative z-10"
+              {/* 2. The Postcard */}
+              <motion.div
+                className="absolute w-[512px]"
+                initial={{ scale: 0.8, opacity: 0, zIndex: 10 }}
+                animate={{ 
+                  scale: 1, 
+                  opacity: 1,
+                  y: packStep === 4 ? -250 : (packStep >= 5 ? 20 : 0),
+                  // Drop Z-index so it slides INSIDE the front pocket at step 5
+                  zIndex: packStep >= 5 ? 10 : 40 
+                }}
+                transition={{ type: "spring", stiffness: 40, damping: 15 }}
               >
-                Go to your Outbox
-              </button>
-            </motion.div>
+                <Postcard data={{ ...formData, previewUrl }} isInteractive={false} forceFlip={false} />
+              </motion.div>
+
+            </div>
+
+            {/* 3. The Final Link UI (Fades in at step 7) */}
+            <AnimatePresence>
+              {packStep === 7 && (
+                <motion.div 
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="absolute bottom-12 bg-white p-8 rounded-2xl shadow-xl flex flex-col items-center text-center max-w-md w-full border border-ink/5"
+                >
+                  <h2 className="font-serif text-3xl font-bold mb-2 text-ink">Signed & Sealed!</h2>
+                  <p className="text-ink/60 mb-6 font-sans">Share this unique link.</p>
+                  
+                  <div className="flex w-full gap-2 mb-6 relative z-10">
+                    <input 
+                      type="text" readOnly value={generatedLink} 
+                      className="flex-1 bg-gray-50 border border-ink/10 rounded-lg px-4 py-3 text-sm outline-none text-ink/70 truncate"
+                    />
+                    <button 
+                      onClick={handleCopyLink}
+                      className="bg-ink text-white px-5 py-3 rounded-lg font-semibold hover:bg-ink/90 transition-colors flex items-center gap-2"
+                    >
+                      {copied ? <CheckCircle2 className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+                      {copied ? 'Copied' : 'Copy'}
+                    </button>
+                  </div>
+                  <button onClick={() => navigate('/dashboard')} className="text-sm font-semibold text-ink underline hover:text-pastel-blue transition-colors">
+                    Go to your Outbox
+                  </button>
+                </motion.div>
+              )}
+            </AnimatePresence>
+
           </motion.div>
         )}
       </AnimatePresence>
