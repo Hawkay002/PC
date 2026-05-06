@@ -15,23 +15,20 @@ export default function Envelope({ postcardData }) {
     if (sealTaps < 3) {
       setSealTaps(prev => prev + 1);
     } else if (step === 0) {
-      // 4th Tap: Show broken seal immediately, then sequence
       setSealTaps(4); 
-      setStep(1); // Seal falls
-      setTimeout(() => setStep(2), 600);  // Flap opens
-      setTimeout(() => setStep(3), 1400); // Card slides up
-      // NO SPIN ROTATION: Rests immediately after sliding out
-      setTimeout(() => setStep(4), 2200); // Rests on envelope
+      setStep(1); 
+      setTimeout(() => setStep(2), 600);  
+      setTimeout(() => setStep(3), 1400); 
+      setTimeout(() => setStep(4), 2200); 
     }
   };
 
   return (
     <div className="w-full max-w-lg mx-auto aspect-[3/2] relative perspective-1000 mt-32">
       
-      {/* 1. Envelope Back */}
       <div className="absolute inset-0 w-full h-full bg-[#EAE5DC] shadow-envelope rounded-md border border-ink/10" />
 
-      {/* 2. Postcard (SPIN REMOVED) */}
+      {/* CRITICAL FIX: forceFlip is now set to {false} so the card never attempts to flip while inside the envelope */}
       <motion.div
         className="absolute inset-2" 
         initial={{ y: 0, zIndex: 10 }}
@@ -42,10 +39,9 @@ export default function Envelope({ postcardData }) {
         }}
         transition={{ type: "spring", stiffness: 40, damping: 14 }}
       >
-        <Postcard data={postcardData} isInteractive={step >= 4} forceFlip={step < 4} />
+        <Postcard data={postcardData} isInteractive={step >= 4} forceFlip={false} />
       </motion.div>
 
-      {/* 3. Front Pocket */}
       <div className="absolute inset-0 w-full h-full z-20 pointer-events-none drop-shadow-sm">
         <svg viewBox="0 0 540 360" className="w-full h-full">
           <path d="M0,0 L270,220 L540,0 L540,360 L0,360 Z" fill="#F4F1EB" stroke="rgba(0,0,0,0.05)" strokeWidth="1" />
@@ -53,7 +49,6 @@ export default function Envelope({ postcardData }) {
         </svg>
       </div>
 
-      {/* 4. Top Flap */}
       <motion.div
         className="absolute top-0 left-0 w-full h-full origin-top drop-shadow-md"
         initial={{ rotateX: 0, zIndex: 30 }}
@@ -68,7 +63,6 @@ export default function Envelope({ postcardData }) {
         </svg>
       </motion.div>
 
-      {/* 5. Preloaded WebP Seal (Perfectly Centered) */}
       <AnimatePresence>
         {step <= 1 && (
           <motion.div
