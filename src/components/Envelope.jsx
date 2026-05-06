@@ -15,13 +15,13 @@ export default function Envelope({ postcardData }) {
     if (sealTaps < 3) {
       setSealTaps(prev => prev + 1);
     } else if (step === 0) {
-      // 4th Tap: Show broken seal (index 4) immediately, then sequence
+      // 4th Tap: Show broken seal immediately, then sequence
       setSealTaps(4); 
       setStep(1); // Seal falls
       setTimeout(() => setStep(2), 600);  // Flap opens
-      setTimeout(() => setStep(3), 1400); // Card up
-      setTimeout(() => setStep(4), 2200); // Spin
-      setTimeout(() => setStep(5), 3200); // Rests
+      setTimeout(() => setStep(3), 1400); // Card slides up
+      // NO SPIN ROTATION: Rests immediately after sliding out
+      setTimeout(() => setStep(4), 2200); // Rests on envelope
     }
   };
 
@@ -31,19 +31,18 @@ export default function Envelope({ postcardData }) {
       {/* 1. Envelope Back */}
       <div className="absolute inset-0 w-full h-full bg-[#EAE5DC] shadow-envelope rounded-md border border-ink/10" />
 
-      {/* 2. Postcard */}
+      {/* 2. Postcard (SPIN REMOVED) */}
       <motion.div
         className="absolute inset-2" 
-        initial={{ y: 0, zIndex: 10, rotateZ: 0 }}
+        initial={{ y: 0, zIndex: 10 }}
         animate={{
-          y: step >= 3 && step <= 4 ? '-110%' : 0,
-          rotateZ: step === 4 ? 360 : 0,
-          zIndex: step >= 5 ? 50 : 10,
-          scale: step >= 5 ? 1.05 : 1
+          y: step === 3 ? '-110%' : 0,
+          zIndex: step >= 4 ? 50 : 10,
+          scale: step >= 4 ? 1.05 : 1
         }}
         transition={{ type: "spring", stiffness: 40, damping: 14 }}
       >
-        <Postcard data={postcardData} isInteractive={step === 5} forceFlip={step < 5} />
+        <Postcard data={postcardData} isInteractive={step >= 4} forceFlip={step < 4} />
       </motion.div>
 
       {/* 3. Front Pocket */}
@@ -69,7 +68,7 @@ export default function Envelope({ postcardData }) {
         </svg>
       </motion.div>
 
-      {/* 5. Preloaded WebP Seal (Perfectly Centered via Flexbox) */}
+      {/* 5. Preloaded WebP Seal (Perfectly Centered) */}
       <AnimatePresence>
         {step <= 1 && (
           <motion.div
