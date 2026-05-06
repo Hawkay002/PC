@@ -112,13 +112,10 @@ export default function CreationPage() {
 
   return (
     <>
-      <div className="max-w-6xl mx-auto p-6 lg:p-12 grid grid-cols-1 lg:grid-cols-2 gap-12 items-start h-screen">
+      <div className="max-w-7xl mx-auto p-4 lg:p-8 flex flex-col lg:flex-row gap-8 items-start min-h-screen">
         
-        {/* Left: The Live 3D Preview (Sticky) */}
-        <div className="sticky top-12 flex flex-col items-center h-full pt-4">
-          <h2 className="text-sm font-sans font-semibold tracking-widest text-ink/50 uppercase mb-8">
-            Live Preview
-          </h2>
+        {/* Left: The Live 3D Preview (Sticky on Desktop) */}
+        <div className="w-full lg:w-[45%] lg:sticky lg:top-12 flex flex-col items-center pt-4 z-10">
           <Postcard 
             data={{ ...formData, previewUrl }} 
             onImageSelect={(file) => {
@@ -127,15 +124,15 @@ export default function CreationPage() {
             }}
           />
           {!imageFile && (
-            <p className="mt-8 text-sm text-pastel-blue font-semibold animate-pulse">
+            <p className="mt-8 text-sm text-pastel-blue font-semibold animate-pulse text-center">
               Click the card to flip it and add your photo!
             </p>
           )}
         </div>
 
-        {/* Right: The Scrollable Controls */}
-        <div className="bg-white rounded-xl shadow-sm border border-ink/5 p-8 max-h-[85vh] overflow-y-auto scrollbar-thin scrollbar-thumb-ink/10 scrollbar-track-transparent">
-          <h1 className="font-serif text-4xl font-bold mb-8 text-ink">Craft your postcard</h1>
+        {/* Right: The Controls (Independent Scroll) */}
+        <div className="w-full lg:w-[55%] bg-white rounded-xl shadow-sm border border-ink/5 p-6 lg:p-8 relative z-0">
+          <h1 className="font-serif text-3xl font-bold mb-8 text-ink">Craft your postcard</h1>
           
           <form onSubmit={handleSubmit} className="space-y-8">
             {/* Text Inputs */}
