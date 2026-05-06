@@ -22,7 +22,7 @@ export default function Postcard({
 
   return (
     <div 
-      className="relative w-full max-w-lg aspect-[3/2] perspective-1000 group cursor-pointer"
+      className="relative w-full aspect-[3/2] perspective-1000 group cursor-pointer"
       onClick={() => isInteractive && setIsFlipped(!isFlipped)}
     >
       <motion.div
@@ -37,10 +37,10 @@ export default function Postcard({
             Postcard
           </div>
           
-          {/* FLOWERS FIXED: Removed opacity restrictions so they show full color */}
+          {/* RESTORED BLENDING: mix-blend-multiply added back */}
           <div className="w-1/2 flex items-center justify-center bg-pastel-blue/5 p-2 relative">
              {data?.decoration ? (
-               <img src={data.decoration} alt="Decoration" className="w-full h-full object-contain drop-shadow-sm" />
+               <img src={data.decoration} alt="Decoration" className="w-full h-full object-contain mix-blend-multiply drop-shadow-sm" />
              ) : (
                <div className="w-24 h-24 border-2 border-dashed border-ink/10 rounded-full flex items-center justify-center text-ink/30 text-xs text-center p-2">Select Flower</div>
              )}
@@ -90,7 +90,6 @@ export default function Postcard({
                 </button>
                 <input type="file" ref={fileInputRef} accept="image/*" className="hidden" onChange={handleFileChange} />
 
-                {/* Camera button properly triggers */}
                 <button 
                   type="button"
                   onClick={() => cameraInputRef.current?.click()}
