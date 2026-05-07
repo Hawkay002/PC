@@ -1,14 +1,19 @@
 import { motion } from 'framer-motion';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 export default function Postcard({ 
   data, 
   isInteractive = true, 
   forceFlip = false,
-  onRemoveImage // New prop for discarding the image
+  onRemoveImage
 }) {
-  const [isFlipped, setIsFlipped] = useState(false);
-  const currentFlipState = isInteractive ? isFlipped : forceFlip;
+  const [isFlipped, setIsFlipped] = useState(forceFlip);
+
+  // CRITICAL FIX: This listens to the Stepper. Whenever forceFlip changes, 
+  // it updates the card's rotation automatically.
+  useEffect(() => {
+    setIsFlipped(forceFlip);
+  }, [forceFlip]);
 
   return (
     <div 
@@ -18,7 +23,7 @@ export default function Postcard({
       <motion.div
         className="w-full h-full relative transition-shadow duration-500 rounded-lg shadow-card group-hover:shadow-envelope [transform-style:preserve-3d]"
         initial={false}
-        animate={{ rotateY: currentFlipState ? 180 : 0 }}
+        animate={{ rotateY: isFlipped ? 180 : 0 }}
         transition={{ type: 'spring', stiffness: 60, damping: 15 }} 
       >
         
@@ -72,7 +77,6 @@ export default function Postcard({
           {data?.previewUrl || data?.file_id ? (
             <div className="flex-1 w-full relative overflow-hidden rounded border border-ink/5 group/image">
               
-              {/* CSSgram Filter is applied via the data.filter class */}
               <figure className={`w-full h-full m-0 ${data?.filter || ''}`}>
                 <img 
                   src={data?.previewUrl || `/api/image?id=${data.file_id}`} 
@@ -81,11 +85,10 @@ export default function Postcard({
                 />
               </figure>
 
-              {/* Discard / Remove Button (Only active during creation) */}
               {isInteractive && onRemoveImage && (
                 <button
                   onClick={(e) => {
-                    e.stopPropagation(); // Prevents flipping the card when clicking the button
+                    e.stopPropagation(); 
                     onRemoveImage();
                   }}
                   className="absolute top-2 right-2 w-8 h-8 bg-black/60 hover:bg-black/90 text-white rounded-full flex items-center justify-center opacity-0 group-hover/image:opacity-100 transition-opacity z-10 shadow-sm backdrop-blur-sm"
