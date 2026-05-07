@@ -4,7 +4,8 @@ import { useState } from 'react';
 export default function Postcard({ 
   data, 
   isInteractive = true, 
-  forceFlip = false
+  forceFlip = false,
+  onRemoveImage // New prop for discarding the image
 }) {
   const [isFlipped, setIsFlipped] = useState(false);
   const currentFlipState = isInteractive ? isFlipped : forceFlip;
@@ -27,7 +28,6 @@ export default function Postcard({
             Postcard
           </div>
           
-          {/* FIXED: Removed z-10 and background colors so mix-blend-multiply properly targets the paper texture */}
           <div className="w-[45%] flex items-center justify-center p-2 relative">
              {data?.decoration ? (
                <img 
@@ -40,7 +40,6 @@ export default function Postcard({
              )}
           </div>
 
-          {/* FIXED: Removed internal z-indexes so the text and lines share the blend space with the flower */}
           <div className="w-[55%] py-4 pr-4 pl-3 flex flex-col relative">
             <div className="absolute top-3 right-3 w-10 h-12 sm:w-14 sm:h-16 flex items-center justify-center">
                {data?.stamp ? (
@@ -71,12 +70,31 @@ export default function Postcard({
         {/* --- BACK SIDE --- */}
         <div className="absolute inset-0 w-full h-full bg-[#EEDFCD] bg-paper-texture rounded-lg [backface-visibility:hidden] [transform:rotateY(180deg)] overflow-hidden shadow-inner p-4 flex flex-col">
           {data?.previewUrl || data?.file_id ? (
-            <div className="flex-1 w-full relative overflow-hidden rounded border border-ink/5">
-              <img 
-                src={data?.previewUrl || `/api/image?id=${data.file_id}`} 
-                alt="Postcard attachment"
-                className="w-full h-full object-cover object-center" 
-              />
+            <div className="flex-1 w-full relative overflow-hidden rounded border border-ink/5 group/image">
+              
+              {/* CSSgram Filter is applied via the data.filter class */}
+              <figure className={`w-full h-full m-0 ${data?.filter || ''}`}>
+                <img 
+                  src={data?.previewUrl || `/api/image?id=${data.file_id}`} 
+                  alt="Postcard attachment"
+                  className="w-full h-full object-cover object-center" 
+                />
+              </figure>
+
+              {/* Discard / Remove Button (Only active during creation) */}
+              {isInteractive && onRemoveImage && (
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation(); // Prevents flipping the card when clicking the button
+                    onRemoveImage();
+                  }}
+                  className="absolute top-2 right-2 w-8 h-8 bg-black/60 hover:bg-black/90 text-white rounded-full flex items-center justify-center opacity-0 group-hover/image:opacity-100 transition-opacity z-10 shadow-sm backdrop-blur-sm"
+                  title="Remove Image"
+                >
+                  <span className="font-bold text-xl leading-none mt-[-2px]">-</span>
+                </button>
+              )}
+
             </div>
           ) : (
             <div className="flex-1 w-full border-2 border-dashed border-ink/20 rounded bg-white/40 flex flex-col items-center justify-center p-6 text-center">
