@@ -23,14 +23,13 @@ export default function Postcard({
         
         {/* --- FRONT SIDE --- */}
         <div className="absolute inset-0 w-full h-full bg-[#EEDFCD] bg-paper-texture border border-ink/10 rounded-lg [backface-visibility:hidden] flex overflow-hidden">
-          <div className="absolute top-2 left-1/2 -translate-x-1/2 font-serif tracking-[0.2em] text-[10px] sm:text-xs text-ink/40 uppercase z-20">
+          <div className="absolute top-2 left-1/2 -translate-x-1/2 font-serif tracking-[0.2em] text-[10px] sm:text-xs text-ink/40 uppercase">
             Postcard
           </div>
           
-          {/* ADDED z-10: Forces the flower container to stack above the message area */}
-          <div className="w-[45%] flex items-center justify-center bg-pastel-blue/5 p-2 relative z-10">
+          {/* FIXED: Removed z-10 and background colors so mix-blend-multiply properly targets the paper texture */}
+          <div className="w-[45%] flex items-center justify-center p-2 relative">
              {data?.decoration ? (
-               /* ADDED scale and translate-x: Makes the flower physically larger and pushes it to the right over the message space */
                <img 
                  src={data.decoration} 
                  alt="Decoration" 
@@ -41,9 +40,9 @@ export default function Postcard({
              )}
           </div>
 
-          {/* Message Area (w-[55%]) remains structurally the same underneath */}
-          <div className="w-[55%] py-4 pr-4 pl-3 flex flex-col relative z-0">
-            <div className="absolute top-3 right-3 w-10 h-12 sm:w-14 sm:h-16 flex items-center justify-center z-10">
+          {/* FIXED: Removed internal z-indexes so the text and lines share the blend space with the flower */}
+          <div className="w-[55%] py-4 pr-4 pl-3 flex flex-col relative">
+            <div className="absolute top-3 right-3 w-10 h-12 sm:w-14 sm:h-16 flex items-center justify-center">
                {data?.stamp ? (
                  <img src={data.stamp} alt="Stamp" className="w-full h-full object-contain drop-shadow-md" />
                ) : (
@@ -53,17 +52,17 @@ export default function Postcard({
                )}
             </div>
 
-            <div className="font-serif text-ink/80 text-xs sm:text-sm mt-3 sm:mt-4 relative z-20">
+            <div className="font-serif text-ink/80 text-xs sm:text-sm mt-3 sm:mt-4">
               <p><span className="font-bold">To:</span> {data?.to_name || data?.to || 'Recipient'}</p>
             </div>
             
             <div className="mt-2 flex-1 bg-[linear-gradient(transparent_23px,#2C2A2920_24px)] bg-[length:100%_24px]">
-              <p className="font-script text-base leading-[24px] text-ink line-clamp-5 pt-1 pr-2 break-words relative z-20">
+              <p className="font-script text-base leading-[24px] text-ink line-clamp-5 pt-1 pr-2 break-words">
                 {data?.message || 'Write something lovely here...'}
               </p>
             </div>
             
-            <div className="font-serif text-ink/80 text-xs sm:text-sm mt-1 sm:mt-2 relative z-20">
+            <div className="font-serif text-ink/80 text-xs sm:text-sm mt-1 sm:mt-2">
               <p><span className="font-bold">From:</span> {data?.from_name || data?.from || 'Sender'}</p>
             </div>
           </div>
