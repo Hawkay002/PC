@@ -35,7 +35,7 @@ export default function Envelope({ postcardData }) {
           animate={{
             y: step === 3 ? '-110%' : 0,
             zIndex: step >= 4 ? 50 : 10,
-            scale: step >= 4 ? 1.05 : 0.96 
+            scale: 0.96 // LOCKED to 0.96 globally per request
           }}
           transition={{ type: "spring", stiffness: 40, damping: 14 }}
         >
