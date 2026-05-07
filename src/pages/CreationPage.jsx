@@ -35,6 +35,7 @@ const STAMPS = [
   { id: 'stamp4', name: 'Fallen Acorn', img: '/stamps/stamp4.webp' }
 ];
 
+// ALL 41 CSSgram Filters
 const CSSGRAM_FILTERS = [
   { id: 'none', name: 'Normal', class: '' },
   { id: '1977', name: '1977', class: '_1977' },
@@ -92,7 +93,7 @@ export default function CreationPage() {
   const [copied, setCopied] = useState(false);
   const [packStep, setPackStep] = useState(0); 
 
-  // FIXED: Renamed to image_filter to exactly match Supabase database column
+  // FIXED: Renamed filter to image_filter globally
   const [formData, setFormData] = useState({
     to: '', from: '', message: '', font: 'script',
     decoration: FLOWERS[0].img, stamp: STAMPS[0].img, image_filter: ''       
@@ -157,7 +158,6 @@ export default function CreationPage() {
       const uploadData = await uploadRes.json();
       if (!uploadRes.ok) throw new Error(uploadData.error);
 
-      // Successfully pushes formData.image_filter to Supabase
       const postcardId = await createPostcard({ ...formData, file_id: uploadData.file_id });
 
       const savedCards = JSON.parse(localStorage.getItem('my_postcards') || '[]');
@@ -202,7 +202,7 @@ export default function CreationPage() {
             </div>
             <Postcard 
               data={{ ...formData, previewUrl }} 
-              isInteractive={true}
+              isInteractive={true} 
               forceFlip={currentStep === 2} 
               onRemoveImage={handleRemoveImage}
             />
@@ -243,13 +243,14 @@ export default function CreationPage() {
               )}
 
               {currentStep === 2 && (
-                <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="flex flex-col items-center justify-center py-6 space-y-8">
-                  <div className="text-center">
-                    <h2 className="font-serif text-2xl text-ink mb-2">Attach a Memory</h2>
-                    <p className="text-ink/60 text-sm">Upload a photo for the back of your postcard.</p>
+                // FIXED: 'Attach a Memory' left-aligned flawlessly.
+                <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="space-y-6 pt-2 pb-4">
+                  <div>
+                    <h2 className="font-serif text-2xl text-ink">Attach a Memory</h2>
+                    <p className="text-ink/60 text-sm mt-2">Upload a photo for the back of your postcard.</p>
                   </div>
                   
-                  <div className="flex flex-row gap-4 w-full max-w-sm">
+                  <div className="flex flex-row gap-4 w-full">
                     <button type="button" onClick={() => fileInputRef.current?.click()} className="flex-1 flex flex-col items-center justify-center gap-2 bg-pastel-blue/10 hover:bg-pastel-blue/20 text-ink py-4 rounded-xl transition-colors font-medium border border-ink/5">
                       <Upload className="w-5 h-5" /> Upload
                     </button>
@@ -265,7 +266,8 @@ export default function CreationPage() {
                     "w-full pt-4 border-t border-ink/5 transition-opacity duration-300", 
                     imageFile ? "opacity-100 pointer-events-auto" : "opacity-30 pointer-events-none"
                   )}>
-                    <h3 className="font-serif text-lg text-ink text-center mb-4">Choose your filter</h3>
+                    <h3 className="font-serif text-lg text-ink mb-4">Choose your filter</h3>
+                    {/* FIXED: Padding prevents the active scale-105 button from getting cropped */}
                     <div className="flex overflow-x-auto gap-3 pb-4 pt-4 px-2 snap-x" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
                       {CSSGRAM_FILTERS.map((f) => (
                         <button
@@ -375,10 +377,11 @@ export default function CreationPage() {
       <AnimatePresence>
         {showSealingAnim && (
           <motion.div 
+            key="animation-overlay"
             initial={{ opacity: 0 }} animate={{ opacity: 1 }}
-            className="fixed inset-0 z-50 flex items-center justify-center bg-[#FDFBF7] p-4 overflow-hidden"
+            className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-[#FDFBF7] p-4 overflow-hidden"
           >
-            <div className="relative w-full max-w-lg aspect-[3/2] perspective-1000 mt-24">
+            <div className="relative w-full max-w-lg aspect-[3/2] perspective-1000 mb-32">
               
               <motion.div 
                 className="absolute inset-0 bg-[#EAE5DC] shadow-envelope rounded-md border border-ink/10"
@@ -388,16 +391,19 @@ export default function CreationPage() {
               />
 
               <motion.div
-                className="absolute inset-2"
+                className="absolute inset-0 flex items-center justify-center z-10"
                 initial={{ scale: 0.8, opacity: 0, zIndex: 50 }}
                 animate={{ 
-                  scale: 1, opacity: 1,
+                  scale: packStep >= 4 ? 1.05 : 0.96, 
+                  opacity: 1,
                   y: packStep === 3 ? '-110%' : 0, 
                   zIndex: packStep >= 4 ? 10 : 50 
                 }}
                 transition={{ type: "spring", stiffness: 40, damping: 15 }}
               >
-                <Postcard data={{ ...formData, previewUrl }} isInteractive={false} forceFlip={false} />
+                <div className="w-full relative shadow-sm">
+                  <Postcard data={{ ...formData, previewUrl }} isInteractive={false} forceFlip={false} />
+                </div>
               </motion.div>
 
               <motion.div 
@@ -405,7 +411,7 @@ export default function CreationPage() {
                 initial={{ y: '-100vh' }} animate={{ y: packStep >= 1 ? 0 : '-100vh' }}
                 transition={{ type: "spring", stiffness: 40, damping: 15 }}
               >
-                <svg viewBox="0 0 540 360" className="w-full h-full">
+                <svg viewBox="0 0 540 360" preserveAspectRatio="none" className="w-full h-full rounded-b-md overflow-hidden">
                   <path d="M0,0 L270,220 L540,0 L540,360 L0,360 Z" fill="#F4F1EB" stroke="rgba(0,0,0,0.05)" strokeWidth="1" />
                   <path d="M0,360 L270,220 L540,360" fill="none" stroke="rgba(0,0,0,0.03)" strokeWidth="2" />
                 </svg>
@@ -421,34 +427,47 @@ export default function CreationPage() {
                 }}
                 transition={{ duration: 0.8, ease: "easeInOut" }}
               >
-                <svg viewBox="0 0 540 360" className="w-full h-full">
+                <svg viewBox="0 0 540 360" preserveAspectRatio="none" className="w-full h-full rounded-t-md">
                   <path d="M0,0 L270,230 L540,0 Z" fill="#F4F1EB" stroke="rgba(0,0,0,0.08)" strokeWidth="1"/>
                 </svg>
               </motion.div>
 
+              <motion.img 
+                src="/seal-1.webp" 
+                alt="Wax Seal"
+                className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-24 h-24 object-contain z-40"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: packStep >= 6 ? 1 : 0 }}
+                transition={{ duration: 0.5, ease: "easeIn" }}
+              />
             </div>
 
-            <AnimatePresence>
-              {packStep >= 6 && (
-                <motion.div 
-                  initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
-                  className="absolute bottom-8 lg:bottom-12 z-[100] bg-white p-8 rounded-2xl shadow-[0_20px_60px_-15px_rgba(0,0,0,0.3)] flex flex-col items-center text-center max-w-md w-11/12 border border-ink/5"
+            <motion.div 
+              className="absolute bottom-8 lg:bottom-12 z-[100] bg-white p-6 sm:p-8 rounded-2xl shadow-[0_20px_60px_-15px_rgba(0,0,0,0.3)] flex flex-col items-center text-center max-w-md w-11/12 border border-ink/5"
+              animate={{ opacity: packStep >= 6 ? 1 : 0, y: packStep >= 6 ? 0 : 20 }}
+              style={{ pointerEvents: packStep >= 6 ? 'auto' : 'none' }}
+              transition={{ duration: 0.3 }}
+            >
+              <h2 className="font-serif text-3xl font-bold mb-2 text-ink">Signed & Sealed!</h2>
+              <p className="text-ink/60 mb-6 font-sans">Share this unique link.</p>
+              
+              <div className="flex flex-col sm:flex-row w-full gap-3 mb-6 relative z-10">
+                <input 
+                  type="text" readOnly value={generatedLink} 
+                  className="w-full sm:flex-1 bg-gray-50 border border-ink/10 rounded-lg px-4 py-3 text-center sm:text-left text-sm outline-none text-ink/70" 
+                />
+                <button 
+                  onClick={handleCopyLink} 
+                  className="w-full sm:w-auto bg-ink text-white px-6 py-3 rounded-lg font-semibold hover:bg-ink/90 flex items-center justify-center gap-2 shrink-0 transition-all"
                 >
-                  <h2 className="font-serif text-3xl font-bold mb-2 text-ink">Signed & Sealed!</h2>
-                  <p className="text-ink/60 mb-6 font-sans">Share this unique link.</p>
-                  
-                  <div className="flex w-full gap-2 mb-6 relative z-10">
-                    <input type="text" readOnly value={generatedLink} className="flex-1 bg-gray-50 border border-ink/10 rounded-lg px-4 py-3 text-sm outline-none text-ink/70 truncate" />
-                    <button onClick={handleCopyLink} className="bg-ink text-white px-5 py-3 rounded-lg font-semibold hover:bg-ink/90 flex items-center gap-2">
-                      {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />} {copied ? 'Copied' : 'Copy'}
-                    </button>
-                  </div>
-                  <button onClick={() => navigate('/dashboard')} className="text-sm font-semibold text-ink underline hover:text-pastel-blue transition-colors">
-                    Go to your Outbox
-                  </button>
-                </motion.div>
-              )}
-            </AnimatePresence>
+                  {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />} {copied ? 'Copied' : 'Copy'}
+                </button>
+              </div>
+              <button onClick={() => navigate('/dashboard')} className="text-sm font-semibold text-ink underline hover:text-pastel-blue transition-colors">
+                Go to your Outbox
+              </button>
+            </motion.div>
+            
           </motion.div>
         )}
       </AnimatePresence>
