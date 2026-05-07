@@ -27,7 +27,8 @@ export default function Postcard({
             Postcard
           </div>
           
-          <div className="w-1/2 flex items-center justify-center bg-pastel-blue/5 p-2 relative">
+          {/* Shifted to w-2/5 (40% width) to give message more room */}
+          <div className="w-2/5 flex items-center justify-center bg-pastel-blue/5 p-2 relative">
              {data?.decoration ? (
                <img src={data.decoration} alt="Decoration" className="w-full h-full object-contain mix-blend-multiply drop-shadow-sm" />
              ) : (
@@ -35,9 +36,8 @@ export default function Postcard({
              )}
           </div>
 
-          <div className="w-1/2 p-6 flex flex-col relative">
-            
-            {/* FIXED STAMP CONTAINER: Removed white background box */}
+          {/* Shifted to w-3/5 (60% width) so lines extend further left */}
+          <div className="w-3/5 p-6 flex flex-col relative">
             <div className="absolute top-4 right-4 w-14 h-16 flex items-center justify-center z-10">
                {data?.stamp ? (
                  <img src={data.stamp} alt="Stamp" className="w-full h-full object-contain drop-shadow-md" />
@@ -51,11 +51,13 @@ export default function Postcard({
             <div className="font-serif text-ink/80 text-sm mt-4">
               <p><span className="font-bold">To:</span> {data?.to_name || data?.to || 'Recipient'}</p>
             </div>
+            
             <div className="mt-4 flex-1 bg-[linear-gradient(transparent_23px,#2C2A2920_24px)] bg-[length:100%_24px]">
-              <p className="font-script text-lg leading-[24px] text-ink line-clamp-5 pt-1">
+              <p className="font-script text-lg leading-[24px] text-ink line-clamp-5 pt-1 pr-12">
                 {data?.message || 'Write something lovely here...'}
               </p>
             </div>
+            
             <div className="font-serif text-ink/80 text-sm text-right mt-2">
               <p><span className="font-bold">From:</span> {data?.from_name || data?.from || 'Sender'}</p>
             </div>
