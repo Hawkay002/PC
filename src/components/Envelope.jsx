@@ -24,26 +24,27 @@ export default function Envelope({ postcardData }) {
   };
 
   return (
-    // Wrapper ensures perfect vertical and horizontal centering on any screen size
     <div className="w-full h-full min-h-[80vh] flex flex-col items-center justify-center p-4">
       <div className="w-full max-w-lg mx-auto aspect-[3/2] relative perspective-1000">
         
         <div className="absolute inset-0 w-full h-full bg-[#EAE5DC] shadow-envelope rounded-md border border-ink/10" />
 
+        {/* CRITICAL FIX: Uniform scale prevents aspect ratio distortion */}
         <motion.div
-          className="absolute inset-2" 
-          initial={{ y: 0, zIndex: 10 }}
+          className="absolute inset-0 flex items-center justify-center z-10" 
+          initial={{ y: 0 }}
           animate={{
             y: step === 3 ? '-110%' : 0,
             zIndex: step >= 4 ? 50 : 10,
-            scale: step >= 4 ? 1.05 : 1
+            scale: step >= 4 ? 1.05 : 0.96 // Shrinks uniformly to fit inside the pocket
           }}
           transition={{ type: "spring", stiffness: 40, damping: 14 }}
         >
-          <Postcard data={postcardData} isInteractive={step >= 4} forceFlip={false} />
+          <div className="w-full relative shadow-sm">
+            <Postcard data={postcardData} isInteractive={step >= 4} forceFlip={false} />
+          </div>
         </motion.div>
 
-        {/* Added preserveAspectRatio="none" to lock geometry */}
         <div className="absolute inset-0 w-full h-full z-20 pointer-events-none drop-shadow-sm">
           <svg viewBox="0 0 540 360" preserveAspectRatio="none" className="w-full h-full rounded-b-md overflow-hidden">
             <path d="M0,0 L270,220 L540,0 L540,360 L0,360 Z" fill="#F4F1EB" stroke="rgba(0,0,0,0.05)" strokeWidth="1" />
@@ -60,13 +61,11 @@ export default function Envelope({ postcardData }) {
           }}
           transition={{ duration: 0.8, ease: "easeInOut" }}
         >
-          {/* Added preserveAspectRatio="none" to lock geometry */}
           <svg viewBox="0 0 540 360" preserveAspectRatio="none" className="w-full h-full rounded-t-md">
             <path d="M0,0 L270,230 L540,0 Z" fill="#F4F1EB" stroke="rgba(0,0,0,0.08)" strokeWidth="1"/>
           </svg>
         </motion.div>
 
-        {/* Center alignment locked with flexbox for the seal */}
         <AnimatePresence>
           {step <= 1 && (
             <motion.div
@@ -90,7 +89,6 @@ export default function Envelope({ postcardData }) {
                   />
                 ))}
 
-                {/* TAP TO OPEN HINT */}
                 {sealTaps === 0 && (
                   <div className="absolute top-[110%] left-1/2 -translate-x-1/2 mt-4 whitespace-nowrap opacity-70 group-hover:opacity-100 transition-opacity">
                     <span className="bg-black/60 text-white text-xs font-semibold px-3 py-1.5 rounded-full animate-bounce inline-block">
@@ -103,7 +101,6 @@ export default function Envelope({ postcardData }) {
           )}
         </AnimatePresence>
 
-        {/* TAP TO FLIP HINT */}
         <AnimatePresence>
           {step >= 4 && (
             <motion.div
