@@ -35,20 +35,50 @@ const STAMPS = [
   { id: 'stamp4', name: 'Fallen Acorn', img: '/stamps/stamp4.webp' }
 ];
 
-// Top 12 CSSgram Filters
+// ALL 41 CSSgram Filters
 const CSSGRAM_FILTERS = [
-  { id: 'none', name: 'None', class: '' },
+  { id: 'none', name: 'Normal', class: '' },
   { id: '1977', name: '1977', class: '_1977' },
   { id: 'aden', name: 'Aden', class: 'aden' },
   { id: 'amaro', name: 'Amaro', class: 'amaro' },
+  { id: 'ashby', name: 'Ashby', class: 'ashby' },
+  { id: 'brannan', name: 'Brannan', class: 'brannan' },
   { id: 'brooklyn', name: 'Brooklyn', class: 'brooklyn' },
+  { id: 'charmes', name: 'Charmes', class: 'charmes' },
   { id: 'clarendon', name: 'Clarendon', class: 'clarendon' },
+  { id: 'crema', name: 'Crema', class: 'crema' },
+  { id: 'dogpatch', name: 'Dogpatch', class: 'dogpatch' },
   { id: 'earlybird', name: 'Earlybird', class: 'earlybird' },
   { id: 'gingham', name: 'Gingham', class: 'gingham' },
+  { id: 'ginza', name: 'Ginza', class: 'ginza' },
+  { id: 'hefe', name: 'Hefe', class: 'hefe' },
+  { id: 'helena', name: 'Helena', class: 'helena' },
   { id: 'hudson', name: 'Hudson', class: 'hudson' },
-  { id: 'inkwell', name: 'Inkwell', class: 'inkwell' }, // Classic B&W
+  { id: 'inkwell', name: 'Inkwell', class: 'inkwell' },
+  { id: 'juno', name: 'Juno', class: 'juno' },
+  { id: 'kelvin', name: 'Kelvin', class: 'kelvin' },
+  { id: 'lark', name: 'Lark', class: 'lark' },
   { id: 'lofi', name: 'Lo-Fi', class: 'lofi' },
+  { id: 'ludwig', name: 'Ludwig', class: 'ludwig' },
+  { id: 'maven', name: 'Maven', class: 'maven' },
+  { id: 'mayfair', name: 'Mayfair', class: 'mayfair' },
+  { id: 'moon', name: 'Moon', class: 'moon' },
+  { id: 'nashville', name: 'Nashville', class: 'nashville' },
+  { id: 'perpetua', name: 'Perpetua', class: 'perpetua' },
+  { id: 'poprocket', name: 'Poprocket', class: 'poprocket' },
   { id: 'reyes', name: 'Reyes', class: 'reyes' },
+  { id: 'rise', name: 'Rise', class: 'rise' },
+  { id: 'sierra', name: 'Sierra', class: 'sierra' },
+  { id: 'skyline', name: 'Skyline', class: 'skyline' },
+  { id: 'slumber', name: 'Slumber', class: 'slumber' },
+  { id: 'stinson', name: 'Stinson', class: 'stinson' },
+  { id: 'sutro', name: 'Sutro', class: 'sutro' },
+  { id: 'toaster', name: 'Toaster', class: 'toaster' },
+  { id: 'valencia', name: 'Valencia', class: 'valencia' },
+  { id: 'vesper', name: 'Vesper', class: 'vesper' },
+  { id: 'walden', name: 'Walden', class: 'walden' },
+  { id: 'willow', name: 'Willow', class: 'willow' },
+  { id: 'xpro2', name: 'X-Pro II', class: 'xpro2' }
 ];
 
 export default function CreationPage() {
