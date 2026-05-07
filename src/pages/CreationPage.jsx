@@ -29,10 +29,26 @@ const FLOWERS = [
 ];
 
 const STAMPS = [
-  { id: 'stamp1', name: 'Autumn’s Yield', img: '/stamps/stamp1.webp' },
-  { id: 'stamp2', name: 'Winter Forage', img: '/stamps/stamp2.webp' },
-  { id: 'stamp3', name: 'Wildwood Bramble', img: '/stamps/stamp3.webp' },
-  { id: 'stamp4', name: 'Fallen Acorn', img: '/stamps/stamp4.webp' }
+  { id: 'stamp1', name: 'Classic Airmail', img: '/stamps/stamp1.png' },
+  { id: 'stamp2', name: 'Vintage Rose', img: '/stamps/stamp2.png' },
+  { id: 'stamp3', name: 'Gold Leaf', img: '/stamps/stamp3.png' },
+  { id: 'stamp4', name: 'Blue Ocean', img: '/stamps/stamp4.png' }
+];
+
+// Top 12 CSSgram Filters
+const CSSGRAM_FILTERS = [
+  { id: 'none', name: 'None', class: '' },
+  { id: '1977', name: '1977', class: '_1977' },
+  { id: 'aden', name: 'Aden', class: 'aden' },
+  { id: 'amaro', name: 'Amaro', class: 'amaro' },
+  { id: 'brooklyn', name: 'Brooklyn', class: 'brooklyn' },
+  { id: 'clarendon', name: 'Clarendon', class: 'clarendon' },
+  { id: 'earlybird', name: 'Earlybird', class: 'earlybird' },
+  { id: 'gingham', name: 'Gingham', class: 'gingham' },
+  { id: 'hudson', name: 'Hudson', class: 'hudson' },
+  { id: 'inkwell', name: 'Inkwell', class: 'inkwell' }, // Classic B&W
+  { id: 'lofi', name: 'Lo-Fi', class: 'lofi' },
+  { id: 'reyes', name: 'Reyes', class: 'reyes' },
 ];
 
 export default function CreationPage() {
@@ -47,9 +63,10 @@ export default function CreationPage() {
   const [copied, setCopied] = useState(false);
   const [packStep, setPackStep] = useState(0); 
 
+  // Added 'filter' to formData payload
   const [formData, setFormData] = useState({
     to: '', from: '', message: '', font: 'script',
-    decoration: FLOWERS[0].img, stamp: STAMPS[0].img,       
+    decoration: FLOWERS[0].img, stamp: STAMPS[0].img, filter: ''       
   });
   
   const [imageFile, setImageFile] = useState(null);
@@ -81,6 +98,13 @@ export default function CreationPage() {
     }
   };
 
+  // The function passed to Postcard.jsx to discard the image
+  const handleRemoveImage = () => {
+    setImageFile(null);
+    setPreviewUrl('');
+    setFormData({ ...formData, filter: '' }); // Reset filter when image is deleted
+  };
+
   const submitPostcard = async () => {
     if (!imageFile) return alert("Please add a photo!");
     if (!formData.message) return alert("Please write a message!");
@@ -105,6 +129,7 @@ export default function CreationPage() {
       const uploadData = await uploadRes.json();
       if (!uploadRes.ok) throw new Error(uploadData.error);
 
+      // Submits everything including the chosen CSSgram filter string
       const postcardId = await createPostcard({ ...formData, file_id: uploadData.file_id });
 
       const savedCards = JSON.parse(localStorage.getItem('my_postcards') || '[]');
@@ -149,8 +174,9 @@ export default function CreationPage() {
             </div>
             <Postcard 
               data={{ ...formData, previewUrl }} 
-              isInteractive={false}
+              isInteractive={true} // Must be true so we can click the minus button!
               forceFlip={currentStep === 2} 
+              onRemoveImage={handleRemoveImage}
             />
           </div>
 
@@ -189,32 +215,66 @@ export default function CreationPage() {
               )}
 
               {currentStep === 2 && (
-                <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="flex flex-col items-center justify-center py-8 space-y-8">
+                <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="flex flex-col items-center justify-center py-6 space-y-8">
                   <div className="text-center">
                     <h2 className="font-serif text-2xl text-ink mb-2">Attach a Memory</h2>
                     <p className="text-ink/60 text-sm">Upload a photo for the back of your postcard.</p>
                   </div>
-                  <div className="flex flex-col sm:flex-row gap-4 w-full max-w-sm">
-                    <button type="button" onClick={() => fileInputRef.current?.click()} className="flex-1 flex items-center justify-center gap-2 bg-pastel-blue/10 hover:bg-pastel-blue/20 text-ink py-4 rounded-xl transition-colors font-medium border border-ink/5">
-                      <Upload className="w-5 h-5" /> Upload File
+                  
+                  {/* Side-by-Side Upload & Camera Buttons */}
+                  <div className="flex flex-row gap-4 w-full max-w-sm">
+                    <button type="button" onClick={() => fileInputRef.current?.click()} className="flex-1 flex flex-col items-center justify-center gap-2 bg-pastel-blue/10 hover:bg-pastel-blue/20 text-ink py-4 rounded-xl transition-colors font-medium border border-ink/5">
+                      <Upload className="w-5 h-5" /> Upload
                     </button>
                     <input type="file" ref={fileInputRef} className="hidden" accept="image/*" onChange={(e) => handleRawImageSelect(e.target.files[0])} />
-                    <button type="button" onClick={() => cameraInputRef.current?.click()} className="flex-1 flex items-center justify-center gap-2 bg-pastel-pink/10 hover:bg-pastel-pink/20 text-ink py-4 rounded-xl transition-colors font-medium border border-ink/5">
+                    
+                    <button type="button" onClick={() => cameraInputRef.current?.click()} className="flex-1 flex flex-col items-center justify-center gap-2 bg-pastel-pink/10 hover:bg-pastel-pink/20 text-ink py-4 rounded-xl transition-colors font-medium border border-ink/5">
                       <Camera className="w-5 h-5" /> Camera
                     </button>
                     <input type="file" ref={cameraInputRef} className="hidden" accept="image/*" capture="environment" onChange={(e) => handleRawImageSelect(e.target.files[0])} />
                   </div>
-                  {imageFile && <span className="text-sm font-semibold text-pastel-blue">Photo successfully attached!</span>}
+
+                  {/* Horizontal Filter Slider (Inactive until image is selected) */}
+                  <div className={clsx(
+                    "w-full pt-4 border-t border-ink/5 transition-opacity duration-300", 
+                    imageFile ? "opacity-100 pointer-events-auto" : "opacity-30 pointer-events-none"
+                  )}>
+                    <h3 className="font-serif text-lg text-ink text-center mb-4">Choose your filter</h3>
+                    <div className="flex overflow-x-auto gap-3 pb-4 px-1 snap-x" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+                      {CSSGRAM_FILTERS.map((f) => (
+                        <button
+                          key={f.id}
+                          type="button"
+                          onClick={() => setFormData({ ...formData, filter: f.class })}
+                          className={clsx(
+                            "shrink-0 flex flex-col items-center gap-2 snap-center rounded-xl p-2 transition-all w-[76px]",
+                            formData.filter === f.class ? "bg-ink text-white shadow-md scale-105" : "hover:bg-gray-50 text-ink/70"
+                          )}
+                        >
+                          <figure className={clsx("w-14 h-14 rounded-full overflow-hidden m-0 border-2", formData.filter === f.class ? "border-white" : "border-transparent", f.class)}>
+                             {/* Mini thumbnail preview showing the live filter */}
+                             <img src={previewUrl || "data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs="} alt={f.name} className="w-full h-full object-cover" />
+                          </figure>
+                          <span className="text-[10px] font-semibold tracking-wide uppercase">{f.name}</span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
                 </motion.div>
               )}
 
               {currentStep === 3 && (
                 <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="space-y-6 pt-2">
                   <h2 className="font-serif text-2xl text-ink">Choose a Stamp</h2>
-                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                  
+                  {/* Fixed: 3 stamps in a row, removed white box container */}
+                  <div className="grid grid-cols-3 gap-4">
                     {STAMPS.map((stamp) => (
-                      <button key={stamp.id} type="button" onClick={() => setFormData({...formData, stamp: stamp.img})} className={clsx("flex flex-col items-center p-3 rounded-lg border-2 transition-all", formData.stamp === stamp.img ? "border-pastel-blue bg-pastel-blue/5 shadow-sm" : "border-transparent hover:bg-gray-50")}>
-                        <div className="w-14 h-16 bg-gray-100 shadow-sm border border-white mb-3 overflow-hidden"><img src={stamp.img} alt={stamp.name} className="w-full h-full object-cover" /></div>
+                      <button key={stamp.id} type="button" onClick={() => setFormData({...formData, stamp: stamp.img})} className={clsx("flex flex-col items-center p-3 rounded-xl border-2 transition-all", formData.stamp === stamp.img ? "border-pastel-blue bg-pastel-blue/5 shadow-sm" : "border-transparent hover:bg-gray-50")}>
+                        <div className="w-16 h-16 mb-2 flex items-center justify-center">
+                          <img src={stamp.img} alt={stamp.name} className="w-full h-full object-contain drop-shadow-sm" />
+                        </div>
                         <span className="text-xs text-center font-medium">{stamp.name}</span>
                       </button>
                     ))}
@@ -310,7 +370,7 @@ export default function CreationPage() {
                 className="absolute inset-0 flex items-center justify-center z-10"
                 initial={{ scale: 0.8, opacity: 0, zIndex: 50 }}
                 animate={{ 
-                  scale: packStep >= 4 ? 1.05 : 0.96, // Matches exact logic to prevent aspect distortion
+                  scale: packStep >= 4 ? 1.05 : 0.96, 
                   opacity: 1,
                   y: packStep === 3 ? '-110%' : 0, 
                   zIndex: packStep >= 4 ? 10 : 50 
@@ -318,6 +378,7 @@ export default function CreationPage() {
                 transition={{ type: "spring", stiffness: 40, damping: 15 }}
               >
                 <div className="w-full relative shadow-sm">
+                  {/* isInteractive set to false during animation so user cannot discard it while sliding */}
                   <Postcard data={{ ...formData, previewUrl }} isInteractive={false} forceFlip={false} />
                 </div>
               </motion.div>
