@@ -23,12 +23,11 @@ export default function Postcard({
         
         {/* --- FRONT SIDE --- */}
         <div className="absolute inset-0 w-full h-full bg-[#EEDFCD] bg-paper-texture border border-ink/10 rounded-lg [backface-visibility:hidden] flex overflow-hidden">
-          <div className="absolute top-3 left-1/2 -translate-x-1/2 font-serif tracking-[0.2em] text-xs text-ink/40 uppercase z-20">
+          <div className="absolute top-3 left-1/2 -translate-x-1/2 font-serif tracking-[0.2em] text-xs text-ink/40 uppercase z-10">
             Postcard
           </div>
           
-          {/* FLOWER: Absolutely positioned to retain full size, set to z-10 to overlap the lines */}
-          <div className="absolute top-0 left-0 w-1/2 h-full flex items-center justify-center p-2 z-10 pointer-events-none">
+          <div className="w-[45%] flex items-center justify-center bg-pastel-blue/5 p-2 relative">
              {data?.decoration ? (
                <img src={data.decoration} alt="Decoration" className="w-full h-full object-contain mix-blend-multiply drop-shadow-sm" />
              ) : (
@@ -36,9 +35,8 @@ export default function Postcard({
              )}
           </div>
 
-          {/* MESSAGE AREA: Stretches full width, but padded 35% from the left to slide under the flower */}
-          <div className="w-full h-full pl-[35%] pr-6 py-6 flex flex-col relative z-0">
-            <div className="absolute top-4 right-4 w-14 h-16 flex items-center justify-center z-20">
+          <div className="w-[55%] py-6 pr-6 pl-3 flex flex-col relative">
+            <div className="absolute top-4 right-4 w-14 h-16 flex items-center justify-center z-10">
                {data?.stamp ? (
                  <img src={data.stamp} alt="Stamp" className="w-full h-full object-contain drop-shadow-md" />
                ) : (
@@ -53,7 +51,8 @@ export default function Postcard({
             </div>
             
             <div className="mt-4 flex-1 bg-[linear-gradient(transparent_23px,#2C2A2920_24px)] bg-[length:100%_24px]">
-              <p className="font-script text-lg leading-[24px] text-ink line-clamp-5 pt-1 pr-12 relative z-0">
+              {/* FIXED: Reduced text to text-base, removed pr-12, added break-words */}
+              <p className="font-script text-base leading-[24px] text-ink line-clamp-5 pt-1 pr-2 break-words">
                 {data?.message || 'Write something lovely here...'}
               </p>
             </div>
