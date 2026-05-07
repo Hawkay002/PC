@@ -16,7 +16,7 @@ export default function Postcard({
     >
       <motion.div
         className="w-full h-full relative transition-shadow duration-500 rounded-lg shadow-card group-hover:shadow-envelope [transform-style:preserve-3d]"
-        initial={false} // CRITICAL FIX: Prevents the card from animating on initial page load
+        initial={false}
         animate={{ rotateY: currentFlipState ? 180 : 0 }}
         transition={{ type: 'spring', stiffness: 60, damping: 15 }} 
       >
@@ -36,9 +36,18 @@ export default function Postcard({
           </div>
 
           <div className="w-1/2 p-6 flex flex-col relative">
-            <div className="absolute top-4 right-4 w-12 h-14 shadow-sm flex items-center justify-center bg-white border border-ink/10">
-               {data?.stamp ? <img src={data.stamp} alt="Stamp" className="w-full h-full object-cover" /> : <span className="text-ink/20 text-xs">Stamp</span>}
+            
+            {/* FIXED STAMP CONTAINER: Removed white background box */}
+            <div className="absolute top-4 right-4 w-14 h-16 flex items-center justify-center z-10">
+               {data?.stamp ? (
+                 <img src={data.stamp} alt="Stamp" className="w-full h-full object-contain drop-shadow-md" />
+               ) : (
+                 <div className="w-full h-full border-2 border-dashed border-ink/10 flex items-center justify-center">
+                   <span className="text-ink/20 text-xs">Stamp</span>
+                 </div>
+               )}
             </div>
+
             <div className="font-serif text-ink/80 text-sm mt-4">
               <p><span className="font-bold">To:</span> {data?.to_name || data?.to || 'Recipient'}</p>
             </div>
