@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion';
 import { useState, useEffect } from 'react';
+import clsx from 'clsx';
 
 export default function Postcard({ 
   data, 
@@ -9,8 +10,7 @@ export default function Postcard({
 }) {
   const [isFlipped, setIsFlipped] = useState(forceFlip);
 
-  // CRITICAL FIX: This listens to the Stepper. Whenever forceFlip changes, 
-  // it updates the card's rotation automatically.
+  // Automatically flips the card when the Stepper changes
   useEffect(() => {
     setIsFlipped(forceFlip);
   }, [forceFlip]);
@@ -77,7 +77,8 @@ export default function Postcard({
           {data?.previewUrl || data?.file_id ? (
             <div className="flex-1 w-full relative overflow-hidden rounded border border-ink/5 group/image">
               
-              <figure className={`w-full h-full m-0 ${data?.filter || ''}`}>
+              {/* FIXED: The filter is applied to the <figure> wrapper, exactly as CSSgram requires */}
+              <figure className={clsx("w-full h-full m-0", data.image_filter)}>
                 <img 
                   src={data?.previewUrl || `/api/image?id=${data.file_id}`} 
                   alt="Postcard attachment"
@@ -85,10 +86,11 @@ export default function Postcard({
                 />
               </figure>
 
+              {/* Discard Button */}
               {isInteractive && onRemoveImage && (
                 <button
                   onClick={(e) => {
-                    e.stopPropagation(); 
+                    e.stopPropagation(); // Prevents the card from flipping when clicking the minus button
                     onRemoveImage();
                   }}
                   className="absolute top-2 right-2 w-8 h-8 bg-black/60 hover:bg-black/90 text-white rounded-full flex items-center justify-center opacity-0 group-hover/image:opacity-100 transition-opacity z-10 shadow-sm backdrop-blur-sm"
