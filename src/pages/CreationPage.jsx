@@ -29,10 +29,10 @@ const FLOWERS = [
 ];
 
 const STAMPS = [
-  { id: 'stamp1', name: 'Classic Airmail', img: '/stamps/stamp1.png' },
-  { id: 'stamp2', name: 'Vintage Rose', img: '/stamps/stamp2.png' },
-  { id: 'stamp3', name: 'Gold Leaf', img: '/stamps/stamp3.png' },
-  { id: 'stamp4', name: 'Blue Ocean', img: '/stamps/stamp4.png' }
+  { id: 'stamp1', name: 'Autumn’s Yield', img: '/stamps/stamp1.webp' },
+  { id: 'stamp2', name: 'Winter Forage', img: '/stamps/stamp2.webp' },
+  { id: 'stamp3', name: 'Wildwood Bramble', img: '/stamps/stamp3.webp' },
+  { id: 'stamp4', name: 'Fallen Acorn', img: '/stamps/stamp4.webp' }
 ];
 
 const CSSGRAM_FILTERS = [
