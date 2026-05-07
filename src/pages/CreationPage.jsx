@@ -29,13 +29,12 @@ const FLOWERS = [
 ];
 
 const STAMPS = [
-  { id: 'stamp1', name: 'Autumn’s Yield', img: '/stamps/stamp1.webp' },
-  { id: 'stamp2', name: 'Winter Forage', img: '/stamps/stamp2.webp' },
-  { id: 'stamp3', name: 'Wildwood Bramble', img: '/stamps/stamp3.webp' },
-  { id: 'stamp4', name: 'Fallen Acorn', img: '/stamps/stamp4.webp' }
+  { id: 'stamp1', name: 'Classic Airmail', img: '/stamps/stamp1.png' },
+  { id: 'stamp2', name: 'Vintage Rose', img: '/stamps/stamp2.png' },
+  { id: 'stamp3', name: 'Gold Leaf', img: '/stamps/stamp3.png' },
+  { id: 'stamp4', name: 'Blue Ocean', img: '/stamps/stamp4.png' }
 ];
 
-// ALL 41 CSSgram Filters
 const CSSGRAM_FILTERS = [
   { id: 'none', name: 'Normal', class: '' },
   { id: '1977', name: '1977', class: '_1977' },
@@ -93,7 +92,6 @@ export default function CreationPage() {
   const [copied, setCopied] = useState(false);
   const [packStep, setPackStep] = useState(0); 
 
-  // Added 'filter' to formData payload
   const [formData, setFormData] = useState({
     to: '', from: '', message: '', font: 'script',
     decoration: FLOWERS[0].img, stamp: STAMPS[0].img, filter: ''       
@@ -128,11 +126,10 @@ export default function CreationPage() {
     }
   };
 
-  // The function passed to Postcard.jsx to discard the image
   const handleRemoveImage = () => {
     setImageFile(null);
     setPreviewUrl('');
-    setFormData({ ...formData, filter: '' }); // Reset filter when image is deleted
+    setFormData({ ...formData, filter: '' }); 
   };
 
   const submitPostcard = async () => {
@@ -159,7 +156,6 @@ export default function CreationPage() {
       const uploadData = await uploadRes.json();
       if (!uploadRes.ok) throw new Error(uploadData.error);
 
-      // Submits everything including the chosen CSSgram filter string
       const postcardId = await createPostcard({ ...formData, file_id: uploadData.file_id });
 
       const savedCards = JSON.parse(localStorage.getItem('my_postcards') || '[]');
@@ -204,7 +200,7 @@ export default function CreationPage() {
             </div>
             <Postcard 
               data={{ ...formData, previewUrl }} 
-              isInteractive={true} // Must be true so we can click the minus button!
+              isInteractive={true}
               forceFlip={currentStep === 2} 
               onRemoveImage={handleRemoveImage}
             />
@@ -245,14 +241,14 @@ export default function CreationPage() {
               )}
 
               {currentStep === 2 && (
-                <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="flex flex-col items-center justify-center py-6 space-y-8">
-                  <div className="text-center">
-                    <h2 className="font-serif text-2xl text-ink mb-2">Attach a Memory</h2>
-                    <p className="text-ink/60 text-sm">Upload a photo for the back of your postcard.</p>
+                // FIXED ALIGNMENT: Removed center justification to match other steps
+                <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="space-y-6 pt-2 pb-4">
+                  <div>
+                    <h2 className="font-serif text-2xl text-ink">Attach a Memory</h2>
+                    <p className="text-ink/60 text-sm mt-2">Upload a photo for the back of your postcard.</p>
                   </div>
                   
-                  {/* Side-by-Side Upload & Camera Buttons */}
-                  <div className="flex flex-row gap-4 w-full max-w-sm">
+                  <div className="flex flex-row gap-4 w-full">
                     <button type="button" onClick={() => fileInputRef.current?.click()} className="flex-1 flex flex-col items-center justify-center gap-2 bg-pastel-blue/10 hover:bg-pastel-blue/20 text-ink py-4 rounded-xl transition-colors font-medium border border-ink/5">
                       <Upload className="w-5 h-5" /> Upload
                     </button>
@@ -264,13 +260,13 @@ export default function CreationPage() {
                     <input type="file" ref={cameraInputRef} className="hidden" accept="image/*" capture="environment" onChange={(e) => handleRawImageSelect(e.target.files[0])} />
                   </div>
 
-                  {/* Horizontal Filter Slider (Inactive until image is selected) */}
                   <div className={clsx(
                     "w-full pt-4 border-t border-ink/5 transition-opacity duration-300", 
                     imageFile ? "opacity-100 pointer-events-auto" : "opacity-30 pointer-events-none"
                   )}>
-                    <h3 className="font-serif text-lg text-ink text-center mb-4">Choose your filter</h3>
-                    <div className="flex overflow-x-auto gap-3 pb-4 px-1 snap-x" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+                    <h3 className="font-serif text-lg text-ink mb-4">Choose your filter</h3>
+                    {/* FIXED CLIPPING: Added pt-4 and px-2 to prevent the scale-105 from getting chopped off */}
+                    <div className="flex overflow-x-auto gap-3 pb-4 pt-4 px-2 snap-x" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
                       {CSSGRAM_FILTERS.map((f) => (
                         <button
                           key={f.id}
@@ -282,7 +278,6 @@ export default function CreationPage() {
                           )}
                         >
                           <figure className={clsx("w-14 h-14 rounded-full overflow-hidden m-0 border-2", formData.filter === f.class ? "border-white" : "border-transparent", f.class)}>
-                             {/* Mini thumbnail preview showing the live filter */}
                              <img src={previewUrl || "data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs="} alt={f.name} className="w-full h-full object-cover" />
                           </figure>
                           <span className="text-[10px] font-semibold tracking-wide uppercase">{f.name}</span>
@@ -290,15 +285,12 @@ export default function CreationPage() {
                       ))}
                     </div>
                   </div>
-
                 </motion.div>
               )}
 
               {currentStep === 3 && (
                 <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="space-y-6 pt-2">
                   <h2 className="font-serif text-2xl text-ink">Choose a Stamp</h2>
-                  
-                  {/* Fixed: 3 stamps in a row, removed white box container */}
                   <div className="grid grid-cols-3 gap-4">
                     {STAMPS.map((stamp) => (
                       <button key={stamp.id} type="button" onClick={() => setFormData({...formData, stamp: stamp.img})} className={clsx("flex flex-col items-center p-3 rounded-xl border-2 transition-all", formData.stamp === stamp.img ? "border-pastel-blue bg-pastel-blue/5 shadow-sm" : "border-transparent hover:bg-gray-50")}>
@@ -396,21 +388,19 @@ export default function CreationPage() {
                 transition={{ type: "spring", stiffness: 40, damping: 15 }}
               />
 
+              {/* CRITICAL FIX: w-[96%] top-[2%] strictly bounds the card inside the envelope, preventing bleeding */}
               <motion.div
-                className="absolute inset-0 flex items-center justify-center z-10"
+                className="absolute w-[96%] h-[96%] top-[2%] left-[2%] z-10"
                 initial={{ scale: 0.8, opacity: 0, zIndex: 50 }}
                 animate={{ 
-                  scale: packStep >= 4 ? 1.05 : 0.96, 
+                  scale: packStep >= 4 ? 1.05 : 1, 
                   opacity: 1,
                   y: packStep === 3 ? '-110%' : 0, 
                   zIndex: packStep >= 4 ? 10 : 50 
                 }}
                 transition={{ type: "spring", stiffness: 40, damping: 15 }}
               >
-                <div className="w-full relative shadow-sm">
-                  {/* isInteractive set to false during animation so user cannot discard it while sliding */}
-                  <Postcard data={{ ...formData, previewUrl }} isInteractive={false} forceFlip={false} />
-                </div>
+                <Postcard data={{ ...formData, previewUrl }} isInteractive={false} forceFlip={false} />
               </motion.div>
 
               <motion.div 
