@@ -29,10 +29,10 @@ const FLOWERS = [
 ];
 
 const STAMPS = [
-  { id: 'stamp1', name: 'Autumn’s Yield', img: '/stamps/stamp1.webp' },
-  { id: 'stamp2', name: 'Winter Forage', img: '/stamps/stamp2.webp' },
-  { id: 'stamp3', name: 'Wildwood Bramble', img: '/stamps/stamp3.webp' },
-  { id: 'stamp4', name: 'Fallen Acorn', img: '/stamps/stamp4.webp' }
+  { id: 'stamp1', name: 'Classic Airmail', img: '/stamps/stamp1.png' },
+  { id: 'stamp2', name: 'Vintage Rose', img: '/stamps/stamp2.png' },
+  { id: 'stamp3', name: 'Gold Leaf', img: '/stamps/stamp3.png' },
+  { id: 'stamp4', name: 'Blue Ocean', img: '/stamps/stamp4.png' }
 ];
 
 export default function CreationPage() {
@@ -214,7 +214,8 @@ export default function CreationPage() {
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                     {STAMPS.map((stamp) => (
                       <button key={stamp.id} type="button" onClick={() => setFormData({...formData, stamp: stamp.img})} className={clsx("flex flex-col items-center p-3 rounded-lg border-2 transition-all", formData.stamp === stamp.img ? "border-pastel-blue bg-pastel-blue/5 shadow-sm" : "border-transparent hover:bg-gray-50")}>
-                        <div className="w-14 h-16 bg-gray-100 shadow-sm border border-white mb-3 overflow-hidden"><img src={stamp.img} alt={stamp.name} className="w-full h-full object-cover" /></div>
+                        {/* FIXED STAMP SELECTOR: Removed white box background entirely */}
+                        <div className="w-16 h-16 mb-2 flex items-center justify-center"><img src={stamp.img} alt={stamp.name} className="w-full h-full object-contain drop-shadow-sm" /></div>
                         <span className="text-xs text-center font-medium">{stamp.name}</span>
                       </button>
                     ))}
@@ -297,7 +298,6 @@ export default function CreationPage() {
             initial={{ opacity: 0 }} animate={{ opacity: 1 }}
             className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-[#FDFBF7] p-4 overflow-hidden"
           >
-            {/* Added mb-32 so it sits perfectly above the modal on all viewports */}
             <div className="relative w-full max-w-lg aspect-[3/2] perspective-1000 mb-32">
               
               <motion.div 
@@ -325,7 +325,6 @@ export default function CreationPage() {
                 initial={{ y: '-100vh' }} animate={{ y: packStep >= 1 ? 0 : '-100vh' }}
                 transition={{ type: "spring", stiffness: 40, damping: 15 }}
               >
-                {/* SVG aspect lock ensures it matches the bg-[#EAE5DC] div perfectly */}
                 <svg viewBox="0 0 540 360" preserveAspectRatio="none" className="w-full h-full rounded-b-md overflow-hidden">
                   <path d="M0,0 L270,220 L540,0 L540,360 L0,360 Z" fill="#F4F1EB" stroke="rgba(0,0,0,0.05)" strokeWidth="1" />
                   <path d="M0,360 L270,220 L540,360" fill="none" stroke="rgba(0,0,0,0.03)" strokeWidth="2" />
@@ -347,7 +346,6 @@ export default function CreationPage() {
                 </svg>
               </motion.div>
 
-              {/* Final Seal Application */}
               <motion.img 
                 src="/seal-1.webp" 
                 alt="Wax Seal"
