@@ -29,10 +29,10 @@ const FLOWERS = [
 ];
 
 const STAMPS = [
-  { id: 'stamp1', name: 'Autumn’s Yield', img: '/stamps/stamp1.webp' },
-  { id: 'stamp2', name: 'Winter Forage', img: '/stamps/stamp2.webp' },
-  { id: 'stamp3', name: 'Wildwood Bramble', img: '/stamps/stamp3.webp' },
-  { id: 'stamp4', name: 'Fallen Acorn', img: '/stamps/stamp4.webp' }
+  { id: 'stamp1', name: 'Classic Airmail', img: '/stamps/stamp1.png' },
+  { id: 'stamp2', name: 'Vintage Rose', img: '/stamps/stamp2.png' },
+  { id: 'stamp3', name: 'Gold Leaf', img: '/stamps/stamp3.png' },
+  { id: 'stamp4', name: 'Blue Ocean', img: '/stamps/stamp4.png' }
 ];
 
 export default function CreationPage() {
@@ -214,8 +214,7 @@ export default function CreationPage() {
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                     {STAMPS.map((stamp) => (
                       <button key={stamp.id} type="button" onClick={() => setFormData({...formData, stamp: stamp.img})} className={clsx("flex flex-col items-center p-3 rounded-lg border-2 transition-all", formData.stamp === stamp.img ? "border-pastel-blue bg-pastel-blue/5 shadow-sm" : "border-transparent hover:bg-gray-50")}>
-                        {/* FIXED STAMP SELECTOR: Removed white box background entirely */}
-                        <div className="w-16 h-16 mb-2 flex items-center justify-center"><img src={stamp.img} alt={stamp.name} className="w-full h-full object-contain drop-shadow-sm" /></div>
+                        <div className="w-14 h-16 bg-gray-100 shadow-sm border border-white mb-3 overflow-hidden"><img src={stamp.img} alt={stamp.name} className="w-full h-full object-cover" /></div>
                         <span className="text-xs text-center font-medium">{stamp.name}</span>
                       </button>
                     ))}
@@ -308,16 +307,19 @@ export default function CreationPage() {
               />
 
               <motion.div
-                className="absolute inset-2"
+                className="absolute inset-0 flex items-center justify-center z-10"
                 initial={{ scale: 0.8, opacity: 0, zIndex: 50 }}
                 animate={{ 
-                  scale: 1, opacity: 1,
+                  scale: packStep >= 4 ? 1.05 : 0.96, // Matches exact logic to prevent aspect distortion
+                  opacity: 1,
                   y: packStep === 3 ? '-110%' : 0, 
                   zIndex: packStep >= 4 ? 10 : 50 
                 }}
                 transition={{ type: "spring", stiffness: 40, damping: 15 }}
               >
-                <Postcard data={{ ...formData, previewUrl }} isInteractive={false} forceFlip={false} />
+                <div className="w-full relative shadow-sm">
+                  <Postcard data={{ ...formData, previewUrl }} isInteractive={false} forceFlip={false} />
+                </div>
               </motion.div>
 
               <motion.div 
