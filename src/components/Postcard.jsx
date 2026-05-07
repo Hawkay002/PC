@@ -27,7 +27,6 @@ export default function Postcard({
             Postcard
           </div>
           
-          {/* Shifted to w-2/5 (40% width) to give message more room */}
           <div className="w-2/5 flex items-center justify-center bg-pastel-blue/5 p-2 relative">
              {data?.decoration ? (
                <img src={data.decoration} alt="Decoration" className="w-full h-full object-contain mix-blend-multiply drop-shadow-sm" />
@@ -36,7 +35,6 @@ export default function Postcard({
              )}
           </div>
 
-          {/* Shifted to w-3/5 (60% width) so lines extend further left */}
           <div className="w-3/5 p-6 flex flex-col relative">
             <div className="absolute top-4 right-4 w-14 h-16 flex items-center justify-center z-10">
                {data?.stamp ? (
@@ -58,7 +56,8 @@ export default function Postcard({
               </p>
             </div>
             
-            <div className="font-serif text-ink/80 text-sm text-right mt-2">
+            {/* FIXED ALIGNMENT: Removed 'text-right' so it naturally aligns left with the 'To' field */}
+            <div className="font-serif text-ink/80 text-sm mt-2">
               <p><span className="font-bold">From:</span> {data?.from_name || data?.from || 'Sender'}</p>
             </div>
           </div>
