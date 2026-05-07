@@ -29,18 +29,19 @@ export default function Envelope({ postcardData }) {
         
         <div className="absolute inset-0 w-full h-full bg-[#EAE5DC] shadow-envelope rounded-md border border-ink/10" />
 
-        {/* CRITICAL FIX: w-[96%] top-[2%] safely bounds it inside the envelope without aspect distortion */}
         <motion.div
-          className="absolute w-[96%] h-[96%] top-[2%] left-[2%] z-10" 
+          className="absolute inset-0 flex items-center justify-center z-10" 
           initial={{ y: 0 }}
           animate={{
             y: step === 3 ? '-110%' : 0,
             zIndex: step >= 4 ? 50 : 10,
-            scale: step >= 4 ? 1.05 : 1 
+            scale: step >= 4 ? 1.05 : 0.96 
           }}
           transition={{ type: "spring", stiffness: 40, damping: 14 }}
         >
-          <Postcard data={postcardData} isInteractive={step >= 4} forceFlip={false} />
+          <div className="w-full relative shadow-sm">
+            <Postcard data={postcardData} isInteractive={step >= 4} forceFlip={false} />
+          </div>
         </motion.div>
 
         <div className="absolute inset-0 w-full h-full z-20 pointer-events-none drop-shadow-sm">
