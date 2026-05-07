@@ -394,7 +394,7 @@ export default function CreationPage() {
                 className="absolute inset-0 flex items-center justify-center z-10"
                 initial={{ scale: 0.8, opacity: 0, zIndex: 50 }}
                 animate={{ 
-                  scale: packStep >= 4 ? 1.05 : 0.96, 
+                  scale: packStep >= 4 ? 0.96 : 0.96, 
                   opacity: 1,
                   y: packStep === 3 ? '-110%' : 0, 
                   zIndex: packStep >= 4 ? 10 : 50 
