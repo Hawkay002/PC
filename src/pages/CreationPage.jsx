@@ -462,7 +462,9 @@ export default function CreationPage() {
                               : "border-rim/50 hover:border-gold/25 hover:bg-surface"
                           )}
                         >
-                          <img src={flower.img} alt={flower.name} className="w-14 h-14 object-contain mb-2 drop-shadow-sm" />
+                          <div className="w-14 h-14 rounded-full bg-cream flex items-center justify-center mb-2 shadow-sm">
+                            <img src={flower.img} alt={flower.name} className="w-11 h-11 object-contain mix-blend-multiply" />
+                          </div>
                           <span className={clsx(
                             "text-[10px] font-sans text-center leading-tight",
                             formData.decoration === flower.img ? "text-champagne" : "text-muted"
