@@ -20,13 +20,13 @@ export default function Postcard({
       onClick={() => isInteractive && setIsFlipped(!isFlipped)}
     >
       <motion.div
-        className="w-full h-full relative transition-shadow duration-500 rounded-sm shadow-card group-hover:shadow-envelope [transform-style:preserve-3d]"
+        className="w-full h-full relative rounded-sm [transform-style:preserve-3d]"
         initial={false}
         animate={{ rotateY: isFlipped ? 180 : 0 }}
         transition={{ type: 'spring', stiffness: 60, damping: 15 }}
       >
         {/* FRONT SIDE */}
-        <div className="absolute inset-0 w-full h-full bg-[#EEDFCD] bg-paper-texture border border-ink/10 rounded-sm [backface-visibility:hidden] flex overflow-hidden">
+        <div className="absolute inset-0 w-full h-full bg-[#EEDFCD] bg-paper-texture border border-ink/10 rounded-sm [backface-visibility:hidden] flex overflow-hidden shadow-card group-hover:shadow-envelope transition-shadow duration-500">
           {/* Letterpress "POSTCARD" header */}
           <div className="absolute top-2 left-1/2 -translate-x-1/2 font-serif tracking-[0.35em] text-[9px] sm:text-[10px] text-ink/35 uppercase">
             Postcard
@@ -84,7 +84,7 @@ export default function Postcard({
         </div>
 
         {/* BACK SIDE */}
-        <div className="absolute inset-0 w-full h-full bg-[#EEDFCD] bg-paper-texture rounded-sm [backface-visibility:hidden] [transform:rotateY(180deg)] overflow-hidden shadow-inner p-3 flex flex-col">
+        <div className="absolute inset-0 w-full h-full bg-[#EEDFCD] bg-paper-texture rounded-sm [backface-visibility:hidden] [transform:rotateY(180deg)] overflow-hidden p-3 flex flex-col shadow-card group-hover:shadow-envelope transition-shadow duration-500">
           {data?.previewUrl || data?.file_id ? (
             <div className="flex-1 w-full relative overflow-hidden rounded-sm border border-ink/10 group/image">
               <figure className={clsx('w-full h-full m-0', data.image_filter)}>
