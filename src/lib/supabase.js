@@ -23,7 +23,10 @@ export async function createPostcard(postcardData) {
         decoration: postcardData.decoration,
         stamp: postcardData.stamp,
         file_id: postcardData.file_id, // Our Telegram proxy ID
-        image_filter: postcardData.imageFilter || 'none',
+        
+        // FIXED: Changed postcardData.imageFilter to postcardData.image_filter 
+        // to exactly match the formData from CreationPage.jsx
+        image_filter: postcardData.image_filter || 'none',
       }
     ])
     .select('id')
