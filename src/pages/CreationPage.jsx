@@ -85,20 +85,20 @@ export default function CreationPage() {
   const navigate = useNavigate();
   const fileInputRef = useRef(null);
   const cameraInputRef = useRef(null);
-  
+
   const [currentStep, setCurrentStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showSealingAnim, setShowSealingAnim] = useState(false);
   const [generatedLink, setGeneratedLink] = useState('');
   const [copied, setCopied] = useState(false);
-  const [packStep, setPackStep] = useState(0); 
+  const [packStep, setPackStep] = useState(0);
 
-  // FIXED: Renamed filter to image_filter globally
+  // Added 'image_filter' to formData payload
   const [formData, setFormData] = useState({
     to: '', from: '', message: '', font: 'script',
     decoration: FLOWERS[0].img, stamp: STAMPS[0].img, image_filter: ''       
   });
-  
+
   const [imageFile, setImageFile] = useState(null);
   const [previewUrl, setPreviewUrl] = useState('');
   const [rawImageSrc, setRawImageSrc] = useState(null);
@@ -128,10 +128,11 @@ export default function CreationPage() {
     }
   };
 
+  // The function passed to Postcard.jsx to discard the image
   const handleRemoveImage = () => {
     setImageFile(null);
     setPreviewUrl('');
-    setFormData({ ...formData, image_filter: '' }); 
+    setFormData({ ...formData, image_filter: '' }); // Reset filter when image is deleted
   };
 
   const submitPostcard = async () => {
@@ -154,10 +155,11 @@ export default function CreationPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ imageBase64: base64 })
       });
-      
+
       const uploadData = await uploadRes.json();
       if (!uploadRes.ok) throw new Error(uploadData.error);
 
+      // Submits everything including the chosen CSSgram filter string
       const postcardId = await createPostcard({ ...formData, file_id: uploadData.file_id });
 
       const savedCards = JSON.parse(localStorage.getItem('my_postcards') || '[]');
@@ -166,12 +168,12 @@ export default function CreationPage() {
 
       setGeneratedLink(`${window.location.origin}/card/${postcardId}`);
       setShowSealingAnim(true);
-      
+
       setTimeout(() => setPackStep(1), 100);    
       setTimeout(() => setPackStep(2), 1200);   
       setTimeout(() => setPackStep(3), 2000);   
       setTimeout(() => setPackStep(4), 2800);   
-      setTimeout(() => setPackStep(5), 3600);   
+      setTimeout(() => setPackStep(5), 3600);
       setTimeout(() => setPackStep(6), 4400);   
 
     } catch (error) {
@@ -202,7 +204,7 @@ export default function CreationPage() {
             </div>
             <Postcard 
               data={{ ...formData, previewUrl }} 
-              isInteractive={true} 
+              isInteractive={true} // Must be true so we can click the minus button!
               forceFlip={currentStep === 2} 
               onRemoveImage={handleRemoveImage}
             />
@@ -243,14 +245,14 @@ export default function CreationPage() {
               )}
 
               {currentStep === 2 && (
-                // FIXED: 'Attach a Memory' left-aligned flawlessly.
-                <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="space-y-6 pt-2 pb-4">
-                  <div>
-                    <h2 className="font-serif text-2xl text-ink">Attach a Memory</h2>
-                    <p className="text-ink/60 text-sm mt-2">Upload a photo for the back of your postcard.</p>
+                <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="flex flex-col items-center justify-center py-6 space-y-8">
+                  <div className="text-center">
+                    <h2 className="font-serif text-2xl text-ink mb-2">Attach a Memory</h2>
+                    <p className="text-ink/60 text-sm">Upload a photo for the back of your postcard.</p>
                   </div>
                   
-                  <div className="flex flex-row gap-4 w-full">
+                  {/* Side-by-Side Upload & Camera Buttons */}
+                  <div className="flex flex-row gap-4 w-full max-w-sm">
                     <button type="button" onClick={() => fileInputRef.current?.click()} className="flex-1 flex flex-col items-center justify-center gap-2 bg-pastel-blue/10 hover:bg-pastel-blue/20 text-ink py-4 rounded-xl transition-colors font-medium border border-ink/5">
                       <Upload className="w-5 h-5" /> Upload
                     </button>
@@ -262,13 +264,13 @@ export default function CreationPage() {
                     <input type="file" ref={cameraInputRef} className="hidden" accept="image/*" capture="environment" onChange={(e) => handleRawImageSelect(e.target.files[0])} />
                   </div>
 
+                  {/* Horizontal Filter Slider (Inactive until image is selected) */}
                   <div className={clsx(
                     "w-full pt-4 border-t border-ink/5 transition-opacity duration-300", 
                     imageFile ? "opacity-100 pointer-events-auto" : "opacity-30 pointer-events-none"
                   )}>
-                    <h3 className="font-serif text-lg text-ink mb-4">Choose your filter</h3>
-                    {/* FIXED: Padding prevents the active scale-105 button from getting cropped */}
-                    <div className="flex overflow-x-auto gap-3 pb-4 pt-4 px-2 snap-x" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+                    <h3 className="font-serif text-lg text-ink text-center mb-4">Choose your filter</h3>
+                    <div className="flex overflow-x-auto gap-3 pb-4 px-1 snap-x" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
                       {CSSGRAM_FILTERS.map((f) => (
                         <button
                           key={f.id}
@@ -280,6 +282,7 @@ export default function CreationPage() {
                           )}
                         >
                           <figure className={clsx("w-14 h-14 rounded-full overflow-hidden m-0 border-2", formData.image_filter === f.class ? "border-white" : "border-transparent", f.class)}>
+                             {/* Mini thumbnail preview showing the live filter */}
                              <img src={previewUrl || "data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs="} alt={f.name} className="w-full h-full object-cover" />
                           </figure>
                           <span className="text-[10px] font-semibold tracking-wide uppercase">{f.name}</span>
@@ -287,12 +290,15 @@ export default function CreationPage() {
                       ))}
                     </div>
                   </div>
+
                 </motion.div>
               )}
 
               {currentStep === 3 && (
                 <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="space-y-6 pt-2">
                   <h2 className="font-serif text-2xl text-ink">Choose a Stamp</h2>
+                  
+                  {/* Fixed: 3 stamps in a row, removed white box container */}
                   <div className="grid grid-cols-3 gap-4">
                     {STAMPS.map((stamp) => (
                       <button key={stamp.id} type="button" onClick={() => setFormData({...formData, stamp: stamp.img})} className={clsx("flex flex-col items-center p-3 rounded-xl border-2 transition-all", formData.stamp === stamp.img ? "border-pastel-blue bg-pastel-blue/5 shadow-sm" : "border-transparent hover:bg-gray-50")}>
@@ -373,7 +379,7 @@ export default function CreationPage() {
         )}
       </AnimatePresence>
 
-      {/* --- RESTORED: THE PERFECT ORCHESTRATION ANIMATION OVERLAY --- */}
+      {/* --- ORCHESTRATION ANIMATION OVERLAY --- */}
       <AnimatePresence>
         {showSealingAnim && (
           <motion.div 
@@ -394,7 +400,7 @@ export default function CreationPage() {
                 className="absolute inset-0 flex items-center justify-center z-10"
                 initial={{ scale: 0.8, opacity: 0, zIndex: 50 }}
                 animate={{ 
-                  scale: packStep >= 4 ? 0.96 : 0.96, 
+                  scale: packStep >= 4 ? 1.05 : 0.96, 
                   opacity: 1,
                   y: packStep === 3 ? '-110%' : 0, 
                   zIndex: packStep >= 4 ? 10 : 50 
@@ -402,6 +408,7 @@ export default function CreationPage() {
                 transition={{ type: "spring", stiffness: 40, damping: 15 }}
               >
                 <div className="w-full relative shadow-sm">
+                  {/* isInteractive set to false during animation so user cannot discard it while sliding */}
                   <Postcard data={{ ...formData, previewUrl }} isInteractive={false} forceFlip={false} />
                 </div>
               </motion.div>
