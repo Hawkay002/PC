@@ -22,10 +22,7 @@ export async function createPostcard(postcardData) {
         font: postcardData.font || 'script',
         decoration: postcardData.decoration,
         stamp: postcardData.stamp,
-        file_id: postcardData.file_id, // Our Telegram proxy ID
-        
-        // FIXED: Changed postcardData.imageFilter to postcardData.image_filter 
-        // to exactly match the formData from CreationPage.jsx
+        file_id: postcardData.file_id, 
         image_filter: postcardData.image_filter || 'none',
       }
     ])
@@ -50,4 +47,19 @@ export async function getPostcard(id) {
 
   if (error) throw new Error('Postcard not found or expired.');
   return data;
+}
+
+/**
+ * Deletes a postcard from the database.
+ * @param {string} id - The Postcard ID.
+ * @returns {Promise<boolean>} True if successful.
+ */
+export async function deletePostcard(id) {
+  const { error } = await supabase
+    .from('postcards')
+    .delete()
+    .eq('id', id);
+
+  if (error) throw new Error(error.message);
+  return true;
 }
