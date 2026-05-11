@@ -7,11 +7,24 @@ import { deletePostcard } from '../lib/supabase';
 export default function Dashboard() {
   const [postcards, setPostcards] = useState([]);
   const [copiedId, setCopiedId] = useState(null);
-  const [isDeleting, setIsDeleting] = useState(null); // Tracks which card is currently being deleted
+  const [isDeleting, setIsDeleting] = useState(null); 
 
   useEffect(() => {
     const saved = JSON.parse(localStorage.getItem('my_postcards') || '[]');
-    setPostcards(saved.sort((a, b) => new Date(b.date) - new Date(a.date)));
+    
+    // FIXED: Bulletproof sorting that handles old test cards with missing dates
+    const sortedCards = saved.sort((a, b) => {
+      const timeA = a.date ? new Date(a.date).getTime() : 0;
+      const timeB = b.date ? new Date(b.date).getTime() : 0;
+      
+      // Fallback to 0 if the date string is somehow invalid to prevent NaN sorting crashes
+      const validTimeA = isNaN(timeA) ? 0 : timeA;
+      const validTimeB = isNaN(timeB) ? 0 : timeB;
+      
+      return validTimeB - validTimeA; // Sorts newest (highest timestamp) to the top
+    });
+
+    setPostcards(sortedCards);
   }, []);
 
   const handleDelete = async (id) => {
@@ -19,17 +32,17 @@ export default function Dashboard() {
     
     setIsDeleting(id);
     try {
-      // 1. Permanently delete from Supabase Database
+      // 1. Attempt to permanently delete from Supabase Database
       await deletePostcard(id);
-
-      // 2. Remove from Local Storage & State
+    } catch (error) {
+      console.error("Database deletion note:", error);
+      // We explicitly DO NOT throw an alert here. If the card was already missing 
+      // from Supabase, we still want the 'finally' block to run so it clears from the screen.
+    } finally {
+      // 2. Guaranteed Local Storage wipe, clearing out any "ghost" cards
       const updated = postcards.filter(card => card.id !== id);
       setPostcards(updated);
       localStorage.setItem('my_postcards', JSON.stringify(updated));
-    } catch (error) {
-      console.error("Failed to delete from database:", error);
-      alert("Could not delete the postcard. Please try again.");
-    } finally {
       setIsDeleting(null);
     }
   };
@@ -109,7 +122,6 @@ export default function Dashboard() {
                 variants={itemVariants}
                 className="bg-white rounded-2xl p-6 border border-ink/5 shadow-sm group hover:shadow-md hover:border-pastel-blue/40 transition-all flex flex-col relative overflow-hidden"
               >
-                {/* Decorative background element */}
                 <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-pastel-blue/5 to-transparent rounded-bl-[100px] -z-10 transition-transform group-hover:scale-110" />
 
                 <div className="flex items-start justify-between mb-6 z-10">
@@ -118,7 +130,8 @@ export default function Dashboard() {
                   </div>
                   <div className="flex items-center gap-1.5 text-xs font-semibold text-ink/40 bg-gray-50 px-3 py-1.5 rounded-full border border-ink/5">
                     <Clock className="w-3.5 h-3.5" />
-                    {new Date(card.date).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
+                    {/* Safely handles old test cards without dates */}
+                    {card.date ? new Date(card.date).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' }) : 'Older Card'}
                   </div>
                 </div>
                 
@@ -129,7 +142,6 @@ export default function Dashboard() {
                 
                 <div className="mt-8 pt-5 border-t border-ink/5 flex items-center justify-between z-10">
                   
-                  {/* Delete Button */}
                   <button 
                     onClick={() => handleDelete(card.id)}
                     disabled={isDeleting === card.id}
@@ -140,7 +152,6 @@ export default function Dashboard() {
                   </button>
 
                   <div className="flex items-center gap-2">
-                    {/* Copy Link Button */}
                     <button 
                       onClick={() => handleCopyLink(card.id)}
                       className="text-sm font-semibold text-ink/60 hover:text-ink transition-colors px-4 py-2 bg-gray-50 hover:bg-gray-100 rounded-lg flex items-center gap-1.5 border border-transparent hover:border-ink/10"
@@ -149,7 +160,6 @@ export default function Dashboard() {
                       {copiedId === card.id ? 'Copied' : 'Link'}
                     </button>
 
-                    {/* View Live Card Button */}
                     <Link 
                       to={`/card/${card.id}`} 
                       className="w-10 h-10 flex items-center justify-center bg-pastel-blue/10 text-ink rounded-lg hover:bg-pastel-blue hover:text-white transition-all shadow-sm"
