@@ -7,7 +7,7 @@ import NotFound from './pages/NotFound';
 function App() {
   return (
     <Router>
-      <div className="min-h-screen bg-pastel-blue/20 font-sans text-ink selection:bg-pastel-yellow">
+      <div className="min-h-screen bg-obsidian font-sans text-luminary">
         <Routes>
           <Route path="/" element={<CreationPage />} />
           <Route path="/create" element={<CreationPage />} />
