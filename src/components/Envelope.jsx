@@ -117,7 +117,7 @@ export default function Envelope({ postcardData }) {
                     className="absolute top-[110%] left-1/2 -translate-x-1/2 mt-3 whitespace-nowrap"
                   >
                     <span className="bg-panel/90 backdrop-blur text-champagne text-xs font-sans uppercase tracking-[0.15em] px-4 py-1.5 rounded-sm border border-gold/20">
-                      Tap to open
+                      Tap on the seal to break it open (4×)
                     </span>
                   </motion.div>
                 )}
