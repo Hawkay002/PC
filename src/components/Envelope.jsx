@@ -18,7 +18,7 @@ export default function Envelope({ postcardData }) {
       setSealTaps(4);
       setStep(1);
       setTimeout(() => setStep(2), 600);
-      setTimeout(() => setStep(3), 2000);
+      setTimeout(() => setStep(3), 1400);
       setTimeout(() => setStep(4), 2200);
     }
   };
