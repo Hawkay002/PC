@@ -296,17 +296,19 @@ export default function CreationPage() {
                         />
                       </div>
                     </div>
-                    <div>
-                      <label className={labelClass}>Message</label>
-                      <textarea
-                        rows={5} maxLength={200}
-                        placeholder="Write something lovely..."
-                        className={`${inputClass} font-script text-2xl resize-none leading-relaxed`}
-                        value={formData.message}
-                        onChange={e => setFormData({ ...formData, message: e.target.value })}
-                      />
-                      <p className="text-right text-xs text-muted mt-1">{formData.message.length}/200</p>
-                    </div>
+                   <div>
+  <label className={labelClass}>Message</label>
+  <textarea
+    rows={8} 
+    maxLength={200}
+    placeholder="Write something lovely..."
+    className={`${inputClass} font-script text-2xl resize-none leading-relaxed overflow-y-auto`}
+    value={formData.message}
+    onChange={e => setFormData({ ...formData, message: e.target.value })}
+  />
+  <p className="text-right text-xs text-muted mt-1">{formData.message.length}/200</p>
+</div>
+
                   </motion.div>
                 )}
 
