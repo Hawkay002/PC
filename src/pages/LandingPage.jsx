@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router-dom'; 
 import { motion } from 'framer-motion';
 import { ArrowRight, Inbox, Flower2, Sliders, Stamp, Share2 } from 'lucide-react';
 import Postcard from '../components/Postcard';
