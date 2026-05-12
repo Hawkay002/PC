@@ -53,8 +53,14 @@ export default function Envelope({ postcardData }) {
           }}
           transition={{ type: 'spring', stiffness: 40, damping: 14 }}
         >
-          <div className="w-full relative shadow-card">
-            <Postcard data={postcardData} isInteractive={step >= 4} forceFlip={false} />
+          {/* Removed shadow-card from this wrapper to prevent double shadowing */}
+          <div className="w-full relative">
+            <Postcard 
+              data={postcardData} 
+              isInteractive={step >= 4} 
+              forceFlip={false} 
+              showShadow={false} 
+            />
           </div>
         </motion.div>
 
