@@ -15,6 +15,16 @@ export default function Postcard({
     setIsFlipped(forceFlip);
   }, [forceFlip]);
 
+  // Helper function to scale down font size based on character count.
+  // The leading-[24px] must be strictly enforced so it stays locked to the ruled lines!
+  const getDynamicTextSize = (text) => {
+    const length = text?.length || 0;
+    if (length <= 50) return 'text-xl leading-[24px]';
+    if (length <= 100) return 'text-lg leading-[24px]';
+    if (length <= 150) return 'text-base leading-[24px]';
+    return 'text-[14px] leading-[24px]'; // Smallest size to fit ~200 chars smoothly
+  };
+
   return (
     <div
       className="relative w-full aspect-[3/2] perspective-1000 group cursor-pointer"
@@ -77,7 +87,10 @@ export default function Postcard({
 
             {/* Ruled lines */}
             <div className="mt-2 flex-1 bg-[linear-gradient(transparent_23px,#2C2A2918_24px)] bg-[length:100%_24px]">
-              <p className="font-script text-base leading-[24px] text-ink line-clamp-5 pt-1 pr-2 break-words">
+              <p className={clsx(
+                "font-script text-ink pt-1 pr-2 break-words",
+                getDynamicTextSize(data?.message)
+              )}>
                 {data?.message || 'Write something lovely here…'}
               </p>
             </div>
