@@ -325,29 +325,25 @@ export default function CreationPage() {
                     <div className="w-8 h-px bg-gold/40" />
 
                     <div className="grid grid-cols-2 gap-3">
-                     {/* Upload Button */}
-<button
-  type="button"
-  onClick={() => fileInputRef.current?.click()}
-  // Changed py-6 to py-3
-  className="flex flex-col items-center justify-center gap-2 border border-rim hover:border-gold/40 bg-charcoal/50 hover:bg-surface py-3 rounded-sm transition-all group"
->
-  <Upload className="w-5 h-5 text-muted group-hover:text-gold transition-colors" />
-  <span className="text-xs font-sans uppercase tracking-[0.15em] text-muted group-hover:text-champagne">Upload</span>
-</button>
-<input type="file" ref={fileInputRef} className="hidden" accept="image/*" onChange={(e) => handleRawImageSelect(e.target.files[0])} />
+                      <button
+                        type="button"
+                        onClick={() => fileInputRef.current?.click()}
+                        className="flex flex-col items-center justify-center gap-2 border border-rim hover:border-gold/40 bg-charcoal/50 hover:bg-surface py-3 rounded-sm transition-all group"
+                      >
+                        <Upload className="w-5 h-5 text-muted group-hover:text-gold transition-colors" />
+                        <span className="text-xs font-sans uppercase tracking-[0.15em] text-muted group-hover:text-champagne">Upload</span>
+                      </button>
+                      <input type="file" ref={fileInputRef} className="hidden" accept="image/*" onChange={(e) => handleRawImageSelect(e.target.files[0])} />
 
-{/* Camera Button */}
-<button
-  type="button"
-  onClick={() => cameraInputRef.current?.click()}
-  // Changed py-6 to py-3
-  className="flex flex-col items-center justify-center gap-2 border border-rim hover:border-gold/40 bg-charcoal/50 hover:bg-surface py-3 rounded-sm transition-all group"
->
-  <Camera className="w-5 h-5 text-muted group-hover:text-gold transition-colors" />
-  <span className="text-xs font-sans uppercase tracking-[0.15em] text-muted group-hover:text-champagne">Camera</span>
-</button>
-<input type="file" ref={cameraInputRef} className="hidden" accept="image/*" capture="environment" onChange={(e) => handleRawImageSelect(e.target.files[0])} />
+                      <button
+                        type="button"
+                        onClick={() => cameraInputRef.current?.click()}
+                        className="flex flex-col items-center justify-center gap-2 border border-rim hover:border-gold/40 bg-charcoal/50 hover:bg-surface py-3 rounded-sm transition-all group"
+                      >
+                        <Camera className="w-5 h-5 text-muted group-hover:text-gold transition-colors" />
+                        <span className="text-xs font-sans uppercase tracking-[0.15em] text-muted group-hover:text-champagne">Camera</span>
+                      </button>
+                      <input type="file" ref={cameraInputRef} className="hidden" accept="image/*" capture="environment" onChange={(e) => handleRawImageSelect(e.target.files[0])} />
                     </div>
 
                     {/* Filter strip */}
@@ -356,7 +352,7 @@ export default function CreationPage() {
                       imageFile ? "opacity-100 pointer-events-auto" : "opacity-30 pointer-events-none"
                     )}>
                       <p className={labelClass}>Film Filter</p>
-                     <div className="flex overflow-x-auto gap-2 pt-2 pb-3 px-1 snap-x" style={{ scrollbarWidth: 'none' }}>
+                      <div className="flex overflow-x-auto gap-2 pt-2 pb-3 px-1 snap-x" style={{ scrollbarWidth: 'none' }}>
                         {CSSGRAM_FILTERS.map((f) => (
                           <button
                             key={f.id}
@@ -601,7 +597,8 @@ export default function CreationPage() {
                 animate={{
                   y: packStep >= 1 ? 0 : '-100vh',
                   rotateX: (packStep >= 2 && packStep < 5) ? 180 : 0,
-                  zIndex: packStep >= 4 && packStep < 5 ? 0 : 30
+                  // Delay changing back to 30 until step 5 (after it fully slides in)
+                  zIndex: (packStep >= 2 && packStep < 5) ? 5 : 30
                 }}
                 transition={{ duration: 0.8, ease: 'easeInOut' }}
               >
