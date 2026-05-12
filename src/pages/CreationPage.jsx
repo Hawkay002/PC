@@ -325,25 +325,29 @@ export default function CreationPage() {
                     <div className="w-8 h-px bg-gold/40" />
 
                     <div className="grid grid-cols-2 gap-3">
-                      <button
-                        type="button"
-                        onClick={() => fileInputRef.current?.click()}
-                        className="flex flex-col items-center justify-center gap-2 border border-rim hover:border-gold/40 bg-charcoal/50 hover:bg-surface py-6 rounded-sm transition-all group"
-                      >
-                        <Upload className="w-5 h-5 text-muted group-hover:text-gold transition-colors" />
-                        <span className="text-xs font-sans uppercase tracking-[0.15em] text-muted group-hover:text-champagne">Upload</span>
-                      </button>
-                      <input type="file" ref={fileInputRef} className="hidden" accept="image/*" onChange={(e) => handleRawImageSelect(e.target.files[0])} />
+                     {/* Upload Button */}
+<button
+  type="button"
+  onClick={() => fileInputRef.current?.click()}
+  // Changed py-6 to py-3
+  className="flex flex-col items-center justify-center gap-2 border border-rim hover:border-gold/40 bg-charcoal/50 hover:bg-surface py-3 rounded-sm transition-all group"
+>
+  <Upload className="w-5 h-5 text-muted group-hover:text-gold transition-colors" />
+  <span className="text-xs font-sans uppercase tracking-[0.15em] text-muted group-hover:text-champagne">Upload</span>
+</button>
+<input type="file" ref={fileInputRef} className="hidden" accept="image/*" onChange={(e) => handleRawImageSelect(e.target.files[0])} />
 
-                      <button
-                        type="button"
-                        onClick={() => cameraInputRef.current?.click()}
-                        className="flex flex-col items-center justify-center gap-2 border border-rim hover:border-gold/40 bg-charcoal/50 hover:bg-surface py-6 rounded-sm transition-all group"
-                      >
-                        <Camera className="w-5 h-5 text-muted group-hover:text-gold transition-colors" />
-                        <span className="text-xs font-sans uppercase tracking-[0.15em] text-muted group-hover:text-champagne">Camera</span>
-                      </button>
-                      <input type="file" ref={cameraInputRef} className="hidden" accept="image/*" capture="environment" onChange={(e) => handleRawImageSelect(e.target.files[0])} />
+{/* Camera Button */}
+<button
+  type="button"
+  onClick={() => cameraInputRef.current?.click()}
+  // Changed py-6 to py-3
+  className="flex flex-col items-center justify-center gap-2 border border-rim hover:border-gold/40 bg-charcoal/50 hover:bg-surface py-3 rounded-sm transition-all group"
+>
+  <Camera className="w-5 h-5 text-muted group-hover:text-gold transition-colors" />
+  <span className="text-xs font-sans uppercase tracking-[0.15em] text-muted group-hover:text-champagne">Camera</span>
+</button>
+<input type="file" ref={cameraInputRef} className="hidden" accept="image/*" capture="environment" onChange={(e) => handleRawImageSelect(e.target.files[0])} />
                     </div>
 
                     {/* Filter strip */}
