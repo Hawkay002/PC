@@ -39,18 +39,26 @@ const CSSGRAM_FILTERS = [
   { id: 'none', name: 'Original', class: '' },
   { id: '1977', name: '1977', class: '_1977' },
   { id: 'aden', name: 'Aden', class: 'aden' },
-  { id: 'amaro', name: 'Amaro', class: 'amaro'},
+  { id: 'amaro', name: 'Amaro', class: 'amaro' },
+  { id: 'ashby', name: 'Ashby', class: 'ashby' },
   { id: 'brannan', name: 'Brannan', class: 'brannan' },
   { id: 'brooklyn', name: 'Brooklyn', class: 'brooklyn' },
   { id: 'charmes', name: 'Charmes', class: 'charmes' },
   { id: 'clarendon', name: 'Clarendon', class: 'clarendon' },
+  { id: 'crema', name: 'Crema', class: 'crema' },
+  { id: 'dogpatch', name: 'Dogpatch', class: 'dogpatch' },
   { id: 'earlybird', name: 'Earlybird', class: 'earlybird' },
   { id: 'gingham', name: 'Gingham', class: 'gingham' },
+  { id: 'ginza', name: 'Ginza', class: 'ginza' },
+  { id: 'hefe', name: 'Hefe', class: 'hefe' },
+  { id: 'helena', name: 'Helena', class: 'helena' },
   { id: 'hudson', name: 'Hudson', class: 'hudson' },
   { id: 'inkwell', name: 'Inkwell', class: 'inkwell' },
+  { id: 'juno', name: 'Juno', class: 'juno' },
   { id: 'kelvin', name: 'Kelvin', class: 'kelvin' },
   { id: 'lark', name: 'Lark', class: 'lark' },
   { id: 'lofi', name: 'Lo-Fi', class: 'lofi' },
+  { id: 'ludwig', name: 'Ludwig', class: 'ludwig' },
   { id: 'maven', name: 'Maven', class: 'maven' },
   { id: 'mayfair', name: 'Mayfair', class: 'mayfair' },
   { id: 'moon', name: 'Moon', class: 'moon' },
@@ -60,8 +68,10 @@ const CSSGRAM_FILTERS = [
   { id: 'rise', name: 'Rise', class: 'rise' },
   { id: 'sierra', name: 'Sierra', class: 'sierra' },
   { id: 'slumber', name: 'Slumber', class: 'slumber' },
+  { id: 'stinson', name: 'Stinson', class: 'stinson' },
   { id: 'toaster', name: 'Toaster', class: 'toaster' },
   { id: 'valencia', name: 'Valencia', class: 'valencia' },
+  { id: 'vesper', name: 'Vesper', class: 'vesper' },
   { id: 'walden', name: 'Walden', class: 'walden' },
   { id: 'willow', name: 'Willow', class: 'willow' },
   { id: 'xpro2', name: 'X-Pro II', class: 'xpro2' }
@@ -83,6 +93,7 @@ export default function CreationPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showSealingAnim, setShowSealingAnim] = useState(false);
   const [generatedLink, setGeneratedLink] = useState('');
+
   const [copied, setCopied] = useState(false);
   const [packStep, setPackStep] = useState(0);
 
@@ -94,6 +105,7 @@ export default function CreationPage() {
   const [imageFile, setImageFile] = useState(null);
   const [previewUrl, setPreviewUrl] = useState('');
   const [rawImageSrc, setRawImageSrc] = useState(null);
+
   const [crop, setCrop] = useState({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(1);
   const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
@@ -143,10 +155,12 @@ export default function CreationPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ imageBase64: base64 })
       });
+
       const uploadData = await uploadRes.json();
       if (!uploadRes.ok) throw new Error(uploadData.error);
 
       const postcardId = await createPostcard({ ...formData, file_id: uploadData.file_id });
+
       const savedCards = JSON.parse(localStorage.getItem('my_postcards') || '[]');
       savedCards.push({ id: postcardId, to: formData.to, date: new Date().toISOString() });
       localStorage.setItem('my_postcards', JSON.stringify(savedCards));
@@ -348,7 +362,7 @@ export default function CreationPage() {
                       imageFile ? "opacity-100 pointer-events-auto" : "opacity-30 pointer-events-none"
                     )}>
                       <p className={labelClass}>Film Filter</p>
-                      <div className="flex overflow-x-auto gap-2 pt-2 pb-3 snap-x" style={{ scrollbarWidth: 'none' }}>
+                     <div className="flex overflow-x-auto gap-2 pt-2 pb-3 px-1 snap-x" style={{ scrollbarWidth: 'none' }}>
                         {CSSGRAM_FILTERS.map((f) => (
                           <button
                             key={f.id}
@@ -593,7 +607,7 @@ export default function CreationPage() {
                 animate={{
                   y: packStep >= 1 ? 0 : '-100vh',
                   rotateX: (packStep >= 2 && packStep < 5) ? 180 : 0,
-                  zIndex: packStep >= 3 && packStep < 5 ? 0 : 30
+                  zIndex: packStep >= 4 && packStep < 5 ? 0 : 30
                 }}
                 transition={{ duration: 0.8, ease: 'easeInOut' }}
               >
