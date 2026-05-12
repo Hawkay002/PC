@@ -11,7 +11,7 @@ const FEATURES = [
 ];
 
 export default function LandingPage() {
-  [span_7](start_span)[span_8](start_span)// Configuration for the original postcard on landing[span_7](end_span)[span_8](end_span)
+  // Configuration for the original postcard on landing[span_7](end_span)[span_8](end_span)
   const landingPageData = {
     to: "Y'all",
     from: "Shovith",
