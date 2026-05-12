@@ -117,19 +117,20 @@ export default function Envelope({ postcardData }) {
 
               {/* Centered Hint */}
               {sealTaps === 0 && (
-                <motion.div
-                  animate={{ y: [0, -4, 0] }}
-                  transition={{
-                    repeat: Infinity,
-                    duration: 1.5,
-                    ease: 'easeInOut',
-                  }}
-                  className="absolute left-1/2 top-[calc(50%+4.5rem)] -translate-x-1/2"
-                >
-                  <span className="bg-panel/90 backdrop-blur text-champagne text-xs font-sans uppercase tracking-[0.15em] px-4 py-1.5 rounded-sm border border-gold/20 whitespace-nowrap">
-                    Tap on the seal to break it open (4×)
-                  </span>
-                </motion.div>
+                <div className="absolute left-1/2 top-[calc(50%+4.5rem)] -translate-x-1/2">
+                  <motion.div
+                    animate={{ y: [0, -4, 0] }}
+                    transition={{
+                      repeat: Infinity,
+                      duration: 1.5,
+                      ease: 'easeInOut',
+                    }}
+                  >
+                    <span className="bg-panel/90 backdrop-blur text-champagne text-xs font-sans uppercase tracking-[0.15em] px-4 py-1.5 rounded-sm border border-gold/20 whitespace-nowrap">
+                      Tap on the seal to break it open (4×)
+                    </span>
+                  </motion.div>
+                </div>
               )}
             </motion.div>
           )}
