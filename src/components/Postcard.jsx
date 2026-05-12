@@ -89,9 +89,9 @@ export default function Postcard({
             {/* Ruled lines */}
             <div className="mt-2 flex-1 bg-[linear-gradient(transparent_23px,#2C2A2918_24px)] bg-[length:100%_24px]">
               <p className={clsx(
-                "font-script text-ink pt-1 pr-2 break-words",
-                getDynamicTextSize(data?.message)
-              )}>
+  "font-script text-ink pt-1 pr-2 break-words text-center",
+  getDynamicTextSize(data?.message)
+)}>
                 {data?.message || 'Write something lovely here…'}
               </p>
             </div>
