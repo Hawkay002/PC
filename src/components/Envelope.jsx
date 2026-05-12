@@ -53,12 +53,13 @@ export default function Envelope({ postcardData }) {
           }}
           transition={{ type: 'spring', stiffness: 40, damping: 14 }}
         >
+          {/* Removed shadow-card from this wrapper to prevent double shadowing */}
           <div className="w-full relative">
-            <Postcard
-              data={postcardData}
-              isInteractive={step >= 4}
-              forceFlip={false}
-              showShadow={false}
+            <Postcard 
+              data={postcardData} 
+              isInteractive={step >= 4} 
+              forceFlip={false} 
+              showShadow={false} 
             />
           </div>
         </motion.div>
@@ -77,7 +78,7 @@ export default function Envelope({ postcardData }) {
           initial={{ rotateX: 0, zIndex: 30 }}
           animate={{
             rotateX: step >= 2 ? 180 : 0,
-            zIndex: step >= 3 ? 5 : 30
+            zIndex: step >= 3 ? 5 : 30 // Now uses 5 instead of 0 to sit smoothly between layers
           }}
           transition={{ duration: 0.8, ease: 'easeInOut' }}
         >
@@ -94,7 +95,7 @@ export default function Envelope({ postcardData }) {
               animate={step === 1 ? { y: 200, opacity: 0 } : { y: 0, opacity: 1 }}
               transition={{ duration: step === 1 ? 0.6 : 0.2 }}
             >
-              {/* Seal — original placement */}
+              {/* Seal */}
               <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                 <button
                   onClick={handleTapSeal}
@@ -114,12 +115,16 @@ export default function Envelope({ postcardData }) {
                 </button>
               </div>
 
-              {/* Hint — anchored at seal-centre (50%) + half-seal (48px) + gap (8px) */}
+              {/* Centered Hint */}
               {sealTaps === 0 && (
                 <motion.div
                   animate={{ y: [0, -4, 0] }}
-                  transition={{ repeat: Infinity, duration: 1.5, ease: 'easeInOut' }}
-                  className="absolute left-1/2 -translate-x-1/2 top-[calc(50%+56px)]"
+                  transition={{
+                    repeat: Infinity,
+                    duration: 1.5,
+                    ease: 'easeInOut',
+                  }}
+                  className="absolute left-1/2 top-[calc(50%+4.5rem)] -translate-x-1/2"
                 >
                   <span className="bg-panel/90 backdrop-blur text-champagne text-xs font-sans uppercase tracking-[0.15em] px-4 py-1.5 rounded-sm border border-gold/20 whitespace-nowrap">
                     Tap on the seal to break it open (4×)
@@ -129,7 +134,7 @@ export default function Envelope({ postcardData }) {
             </motion.div>
           )}
         </AnimatePresence>
-
+        
         {/* "Tap to flip" hint after opening */}
         <AnimatePresence>
           {step >= 4 && (
