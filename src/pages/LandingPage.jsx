@@ -3,7 +3,7 @@ import { motion, useInView } from 'framer-motion';
 import { useRef } from 'react';
 import {
   ArrowRight, Inbox, Flower2, Sliders, Stamp, Share2,
-  PenLine, ImagePlus, Sparkles, Send, Heart, Clock, Globe
+  PenLine, ImagePlus, Sparkles, Send, Heart, Clock, Globe, Infinity as InfinityIcon
 } from 'lucide-react';
 import Postcard from '../components/Postcard';
 
@@ -12,9 +12,9 @@ import Postcard from '../components/Postcard';
 /* ─────────────────────────────────────────────────────── */
 
 const FEATURES = [
-  { icon: <Flower2 className="w-5 h-5" />,  title: 'Botanical Florals',  desc: '16 hand-illustrated botanicals — from Japanese Anemone to Bird of Paradise — drawn in the tradition of Victorian herbarium prints.' },
-  { icon: <Sliders className="w-5 h-5" />,  title: 'Film Filters',       desc: '10 analog-inspired filters rendered entirely in CSS — no library required. Warm, cool, fade, noir, and more.' },
-  { icon: <Stamp className="w-5 h-5" />,    title: 'Artisan Stamps',     desc: '4 collector-grade stamp designs, each themed around the quiet poetry of seasonal nature.' },
+  { icon: <Flower2 className="w-5 h-5" />,  title: 'Botanical Florals',  desc: '19 hand-illustrated botanicals — from Japanese Anemone to Bird of Paradise — drawn in the tradition of Victorian herbarium prints.' },
+  { icon: <Sliders className="w-5 h-5" />,  title: 'Film Filters',       desc: '29 analog-inspired filters rendered entirely in CSS — no library required. Warm, cool, fade, noir, vintage, and more.' },
+  { icon: <Stamp className="w-5 h-5" />,    title: 'Artisan Stamps',     desc: '6 collector-grade stamp designs, each themed around the quiet poetry of seasonal nature.' },
   { icon: <Share2 className="w-5 h-5" />,   title: 'Share by Link',      desc: 'One link. No app download. Your recipient opens it like unwrapping a letter.' },
 ];
 
@@ -45,10 +45,10 @@ const BOTANICALS = [
 ];
 
 const STATS = [
-  { value: '16',  label: 'Botanical illustrations' },
-  { value: '10',  label: 'Analog film filters' },
-  { value: '4',   label: 'Artisan stamp designs' },
-  { value: '∞',   label: 'Moments preserved' },
+  { value: '19',      label: 'Botanical illustrations' },
+  { value: '29',      label: 'Analog film filters' },
+  { value: '6',       label: 'Artisan stamp designs' },
+  { isIcon: true,     label: 'Moments preserved' },
 ];
 
 const SAMPLE_POSTCARDS = [
@@ -157,8 +157,8 @@ export default function LandingPage() {
             </h2>
 
             <p className="text-muted font-sans text-base lg:text-lg font-light max-w-lg leading-relaxed mb-12">
-              A digital atelier for crafting handcrafted postcards — adorned with botanicals,
-              analog film filters, and artisan stamps — delivered by a single link.
+              A digital atelier for crafting handcrafted postcards — adorned with botanicals decorations,
+              analog filters, and artisan stamps — delivered by a single link.
             </p>
 
             <div className="flex flex-col sm:flex-row items-center gap-4">
@@ -197,7 +197,10 @@ export default function LandingPage() {
           >
             {STATS.map((s, i) => (
               <div key={i} className="flex flex-col items-center gap-1">
-                <span className="font-display text-4xl font-light text-gold/80">{s.value}</span>
+                {s.isIcon
+                  ? <InfinityIcon className="w-9 h-9 text-gold/80" strokeWidth={1.25} />
+                  : <span className="font-display text-4xl font-light text-gold/80">{s.value}</span>
+                }
                 <span className="text-muted text-[10px] font-sans uppercase tracking-[0.2em]">{s.label}</span>
               </div>
             ))}
@@ -209,7 +212,7 @@ export default function LandingPage() {
           <Reveal>
             <div className="relative flex flex-col items-center text-center">
               {/* Large decorative quote mark */}
-              <span className="font-display text-[120px] lg:text-[180px] leading-none text-gold/8 absolute -top-8 left-1/2 -translate-x-1/2 select-none pointer-events-none">
+              <span className="font-display text-[120px] lg:text-[180px] leading-none text-gold/8 absolute -top-20 left-1/2 -translate-x-1/2 select-none pointer-events-none">
                 "
               </span>
               <p className="font-display text-2xl sm:text-3xl lg:text-4xl font-light italic text-luminary/90 max-w-3xl leading-relaxed relative z-10">
@@ -270,7 +273,7 @@ export default function LandingPage() {
                     className="relative"
                   >
                     {/* Dot */}
-                    <div className={`absolute -left-[1.65rem] top-1 w-2.5 h-2.5 rounded-full border ${
+                    <div className={`absolute -left-[1.82rem] top-1 w-2.5 h-2.5 rounded-full border ${
                       i === HISTORY.length - 1
                         ? 'border-gold bg-gold/30'
                         : 'border-rim/60 bg-obsidian'
@@ -427,7 +430,7 @@ export default function LandingPage() {
 
             <Reveal delay={0.2}>
               <p className="text-center text-muted/40 text-[11px] font-sans italic mt-8">
-                16 botanicals available in the creator · Hover to reveal meaning
+                · 19 total botanical decorations available in the creator ·
               </p>
             </Reveal>
           </div>
@@ -552,7 +555,7 @@ export default function LandingPage() {
               rel="noopener noreferrer"
               className="text-champagne hover:text-gold transition-colors duration-300 underline underline-offset-4 decoration-gold/30"
             >
-              Shovith Debnath
+              Shovith
             </a>
           </p>
           <p className="text-[10px] font-sans text-muted/40 italic">© 2026 Correspondance · Made with care</p>
