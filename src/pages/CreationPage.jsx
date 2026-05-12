@@ -83,7 +83,6 @@ export default function CreationPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showSealingAnim, setShowSealingAnim] = useState(false);
   const [generatedLink, setGeneratedLink] = useState('');
-
   const [copied, setCopied] = useState(false);
   const [packStep, setPackStep] = useState(0);
 
@@ -104,7 +103,6 @@ export default function CreationPage() {
 
   const handleRawImageSelect = (file) => {
     if (!file) return;
-
     const reader = new FileReader();
     reader.addEventListener('load', () => setRawImageSrc(reader.result));
     reader.readAsDataURL(file);
@@ -113,7 +111,6 @@ export default function CreationPage() {
   const handleSaveCrop = async () => {
     try {
       const croppedImageFile = await getCroppedImg(rawImageSrc, croppedAreaPixels);
-
       setPreviewUrl(URL.createObjectURL(croppedImageFile));
       setImageFile(croppedImageFile);
       setRawImageSrc(null);
@@ -130,13 +127,11 @@ export default function CreationPage() {
 
   const submitPostcard = async () => {
     if (!imageFile) return alert('Please add a photo.');
-
     if (!formData.message) return alert('Please write a message.');
 
     setIsSubmitting(true);
     try {
       const options = { maxSizeMB: 0.8, maxWidthOrHeight: 1200, useWebWorker: true };
-
       const compressedFile = await imageCompression(imageFile, options);
       const base64 = await new Promise((resolve) => {
         const reader = new FileReader();
@@ -165,21 +160,16 @@ export default function CreationPage() {
       // --- TIMING FIX HERE ---
       setTimeout(() => setPackStep(1), 100);
       setTimeout(() => setPackStep(2), 1200);
-
       setTimeout(() => setPackStep(3), 2000); // Postcard slides up
       setTimeout(() => setPackStep(4), 2800);
-
       // Postcard starts falling
       setTimeout(() => setPackStep(5), 4500);
-
       // Wait 1.7 seconds for card to settle!
       setTimeout(() => setPackStep(6), 5300);
-
       // Drop the wax seal
       
     } catch (error) {
       console.error(error);
-
       alert('Failed to send: ' + error.message);
     } finally {
       setIsSubmitting(false);
@@ -192,22 +182,7 @@ export default function CreationPage() {
     setTimeout(() => setCopied(false), 2000);
   };
 
-  const handleReset = () => {
-    setShowSealingAnim(false);
-    setPackStep(0);
-    setGeneratedLink('');
-    setCopied(false);
-    setCurrentStep(1);
-    setFormData({
-      to: '', from: '', message: '', font: 'script',
-      decoration: FLOWERS[0].img, stamp: STAMPS[0].img, image_filter: ''
-    });
-    setImageFile(null);
-    setPreviewUrl('');
-  };
-
   const inputClass = "w-full bg-charcoal/80 border border-rim hover:border-gold/30 focus:border-gold/50 rounded-sm px-4 py-3 text-luminary font-sans text-sm placeholder:text-muted transition-colors";
-
   const labelClass = "block text-xs font-sans font-medium uppercase tracking-[0.15em] text-muted mb-2";
 
   return (
@@ -578,17 +553,46 @@ export default function CreationPage() {
       </AnimatePresence>
 
       {/* Sealing animation overlay */}
-      <AnimatePresence>
-        {showSealingAnim && (
-          <motion.div
-            key="animation-overlay"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-obsidian p-4 overflow-hidden"
-          >
-            {/* Ambient glow */}
-            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(200,169,110,0.06)_0%,transparent_70%)] pointer-events-none" />
+      {/* Sealing animation overlay */}
+<AnimatePresence>
+  {showSealingAnim && (
+    <motion.div
+      key="animation-overlay"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-obsidian p-4 overflow-hidden"
+    >
+      {/* Ambient glow */}
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(200,169,110,0.06)_0%,transparent_70%)] pointer-events-none" />
 
+      {/* Close button */}
+      <button
+        onClick={() => {
+          setShowSealingAnim(false);
+          setPackStep(0);
+          setGeneratedLink('');
+          setCopied(false);
+
+          // Reset form for new postcard
+          setCurrentStep(1);
+          setPreviewUrl('');
+          setImageFile(null);
+          setRawImageSrc(null);
+
+          setFormData({
+            to: '',
+            from: '',
+            message: '',
+            font: 'script',
+            decoration: FLOWERS[0].img,
+            stamp: STAMPS[0].img,
+            image_filter: ''
+          });
+        }}
+        className="absolute top-5 right-5 z-[120] w-11 h-11 flex items-center justify-center rounded-full border border-rim/60 bg-panel/80 backdrop-blur hover:border-gold/40 hover:bg-panel transition-all"
+      >
+        <X className="w-5 h-5 text-muted hover:text-champagne transition-colors" />
+      </button>
             <div className="relative w-full max-w-lg aspect-[3/2] perspective-1000 mb-32">
               <motion.div
                 className="absolute inset-0 bg-[#EAE5DC] shadow-envelope rounded-sm border border-ink/10"
@@ -656,19 +660,11 @@ export default function CreationPage() {
             </div>
 
             <motion.div
-              className="absolute bottom-8 lg:bottom-10 z-[100] bg-panel border border-gold/20 p-6 sm:p-8 rounded-sm shadow-[0_20px_80px_-20px_rgba(0,0,0,0.8)] flex flex-col items-center text-center max-w-md w-11/12 relative"
+              className="absolute bottom-8 lg:bottom-10 z-[100] bg-panel border border-gold/20 p-6 sm:p-8 rounded-sm shadow-[0_20px_80px_-20px_rgba(0,0,0,0.8)] flex flex-col items-center text-center max-w-md w-11/12"
               animate={{ opacity: packStep >= 6 ? 1 : 0, y: packStep >= 6 ? 0 : 24 }}
               style={{ pointerEvents: packStep >= 6 ? 'auto' : 'none' }}
               transition={{ duration: 0.4 }}
             >
-              <button
-                onClick={handleReset}
-                className="absolute top-4 right-4 text-muted hover:text-champagne transition-colors p-1"
-                aria-label="Close and create new"
-              >
-                <X className="w-5 h-5" />
-              </button>
-
               {/* Gold ornament */}
               <div className="flex items-center gap-3 mb-4">
                 <div className="w-12 h-px bg-gradient-to-r from-transparent to-gold/60" />
