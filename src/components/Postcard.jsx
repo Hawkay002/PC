@@ -56,7 +56,8 @@ export default function Postcard({
               <img
                 src={data.decoration}
                 alt="Decoration"
-                className="w-full h-full object-contain mix-blend-multiply drop-shadow-sm scale-[1.3] sm:scale-[1.4] translate-x-3 sm:translate-x-5 pointer-events-none"
+                // Added opacity-85 and saturate-[0.85] here to create the ink-soaked effect
+                className="w-full h-full object-contain mix-blend-multiply opacity-85 saturate-[0.85] drop-shadow-sm scale-[1.3] sm:scale-[1.4] translate-x-3 sm:translate-x-5 pointer-events-none"
               />
             ) : (
               <div className="w-20 h-20 sm:w-24 sm:h-24 border border-dashed border-ink/15 rounded-full flex items-center justify-center text-ink/30 text-xs text-center p-2">
