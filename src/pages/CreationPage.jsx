@@ -35,8 +35,8 @@ const STAMPS = [
   { id: 'stamp2', name: 'Winter Forage', img: '/stamps/stamp2.webp' },
   { id: 'stamp3', name: 'Wildwood Bramble', img: '/stamps/stamp3.webp' },
   { id: 'stamp4', name: 'Fallen Acorn', img: '/stamps/stamp4.webp' },
-  { id: 'stamp5', name: 'The Rowan Branch', img: '/stamps/stamp4.webp' },
-  { id: 'stamp6', name: 'Echinacea Sky', img: '/stamps/stamp5.webp' }
+  { id: 'stamp5', name: 'The Rowan Branch', img: '/stamps/stamp5.webp' },
+  { id: 'stamp6', name: 'Echinacea Sky', img: '/stamps/stamp6.webp' }
 ];
 
 const CSSGRAM_FILTERS = [
