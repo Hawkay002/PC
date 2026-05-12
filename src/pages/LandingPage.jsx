@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 import { motion, useInView } from 'framer-motion';
 import { useRef } from 'react';
 import {
-  ArrowRight, Inbox, Flower2, Sliders, Stamp, Share2,
+  ArrowRight, Inbox, Flower, Sliders, Stamp, Share2,
   PenLine, ImagePlus, Sparkles, Send, Heart, Clock, Globe, Infinity as InfinityIcon
 } from 'lucide-react';
 import Postcard from '../components/Postcard';
@@ -12,7 +12,7 @@ import Postcard from '../components/Postcard';
 /* ─────────────────────────────────────────────────────── */
 
 const FEATURES = [
-  { icon: <Flower2 className="w-5 h-5" />,  title: 'Botanical Florals',  desc: '19 hand-illustrated botanicals — from Japanese Anemone to Bird of Paradise — drawn in the tradition of Victorian herbarium prints.' },
+  { icon: <Flower className="w-5 h-5" />,  title: 'Botanical Florals',  desc: '19 hand-illustrated botanicals — from Japanese Anemone to Bird of Paradise — drawn in the tradition of Victorian herbarium prints.' },
   { icon: <Sliders className="w-5 h-5" />,  title: 'Film Filters',       desc: '29 analog-inspired filters rendered entirely in CSS — no library required. Warm, cool, fade, noir, vintage, and more.' },
   { icon: <Stamp className="w-5 h-5" />,    title: 'Artisan Stamps',     desc: '6 collector-grade stamp designs, each themed around the quiet poetry of seasonal nature.' },
   { icon: <Share2 className="w-5 h-5" />,   title: 'Share by Link',      desc: 'One link. No app download. Your recipient opens it like unwrapping a letter.' },
