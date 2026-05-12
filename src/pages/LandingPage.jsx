@@ -1,12 +1,12 @@
 import { Link } from 'react-router-dom'; 
 import { motion } from 'framer-motion';
-import { ArrowRight, Inbox, Flower2, Sliders, Stamp, Share2 } from 'lucide-react';
+import { ArrowRight, Inbox, Flower, Sliders, Stamp, Share2 } from 'lucide-react';
 import Postcard from '../components/Postcard';
 
 const FEATURES = [
-  { icon: <Flower2 className="w-6 h-6" />, title: 'Botanical Florals', desc: '16 hand-illustrated botanicals to grace your correspondence.' },
-  { icon: <Sliders className="w-6 h-6" />, title: 'Film Filters', desc: '39 analog filters that turn every photo into a memory.' },
-  { icon: <Stamp className="w-6 h-6" />, title: 'Wax Seals', desc: 'Seal your postcard with a cracking wax ritual.' },
+  { icon: <Flower className="w-6 h-6" />, title: 'Botanical Florals', desc: '16 hand-illustrated botanicals to grace your correspondence.' },
+  { icon: <Sliders className="w-6 h-6" />, title: 'Film Filters', desc: '29 analog filters that turn every photo into a memory.' },
+  { icon: <Stamp className="w-6 h-6" />, title: 'Wax Seals', desc: 'Seal your postcard with a wax ritual.' },
   { icon: <Share2 className="w-6 h-6" />, title: 'Share Anywhere', desc: 'A single link delivers your postcard to anyone, anywhere.' },
 ];
 
