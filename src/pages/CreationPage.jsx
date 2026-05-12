@@ -25,7 +25,9 @@ const FLOWERS = [
   { id: 'orchid', name: 'Orchid', img: '/flowers/orchid.png' },
   { id: 'bird', name: 'Bird of Paradise', img: '/flowers/bird-of-paradise.png' },
   { id: 'poppy', name: 'Red Poppy', img: '/flowers/poppy.png' },
-  { id: 'cosmos', name: 'Purple Cosmos', img: '/flowers/cosmos.png' }
+  { id: 'cosmos', name: 'Purple Cosmos', img: '/flowers/cosmos.png' },
+  { id: 'hydrangea', name: 'Hydrangea Cluster', img: '/flowers/hydrangea.png' },
+  { id: 'protea', name: 'Fiery Protea', img: '/flowers/protea.png' }
 ];
 
 const STAMPS = [
