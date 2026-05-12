@@ -83,7 +83,6 @@ export default function CreationPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showSealingAnim, setShowSealingAnim] = useState(false);
   const [generatedLink, setGeneratedLink] = useState('');
-
   const [copied, setCopied] = useState(false);
   const [packStep, setPackStep] = useState(0);
 
@@ -162,9 +161,12 @@ export default function CreationPage() {
       setTimeout(() => setPackStep(1), 100);
       setTimeout(() => setPackStep(2), 1200);
       setTimeout(() => setPackStep(3), 2000); // Postcard slides up
-      setTimeout(() => setPackStep(4), 2800); // Postcard starts falling
-      setTimeout(() => setPackStep(5), 4500); // Wait 1.7 seconds for card to settle!
-      setTimeout(() => setPackStep(6), 5300); // Drop the wax seal
+      setTimeout(() => setPackStep(4), 2800);
+      // Postcard starts falling
+      setTimeout(() => setPackStep(5), 4500);
+      // Wait 1.7 seconds for card to settle!
+      setTimeout(() => setPackStep(6), 5300);
+      // Drop the wax seal
       
     } catch (error) {
       console.error(error);
@@ -296,19 +298,18 @@ export default function CreationPage() {
                         />
                       </div>
                     </div>
-                   <div>
-  <label className={labelClass}>Message</label>
-  <textarea
-    rows={8} 
-    maxLength={200}
-    placeholder="Write something lovely..."
-    className={`${inputClass} font-script text-2xl resize-none leading-relaxed overflow-y-auto`}
-    value={formData.message}
-    onChange={e => setFormData({ ...formData, message: e.target.value })}
-  />
-  <p className="text-right text-xs text-muted mt-1">{formData.message.length}/200</p>
-</div>
-
+                    <div>
+                      <label className={labelClass}>Message</label>
+                      <textarea
+                        rows={6} 
+                        maxLength={200}
+                        placeholder="Write something lovely..."
+                        className={`${inputClass} font-script text-2xl resize-none leading-relaxed overflow-y-auto`}
+                        value={formData.message}
+                        onChange={e => setFormData({ ...formData, message: e.target.value })}
+                      />
+                      <p className="text-right text-xs text-muted mt-1">{formData.message.length}/200</p>
+                    </div>
                   </motion.div>
                 )}
 
