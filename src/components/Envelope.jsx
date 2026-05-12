@@ -89,43 +89,51 @@ export default function Envelope({ postcardData }) {
 
         {/* Wax seal */}
         <AnimatePresence>
-          {step <= 1 && (
-            <motion.div
-              className="absolute inset-0 flex items-center justify-center z-40 pointer-events-none"
-              animate={step === 1 ? { y: 200, opacity: 0 } : { y: 0, opacity: 1 }}
-              transition={{ duration: step === 1 ? 0.6 : 0.2 }}
-            >
-              <button
-                onClick={handleTapSeal}
-                className="relative w-24 h-24 cursor-pointer drop-shadow-xl pointer-events-auto group"
-              >
-                {[1, 2, 3, 4, 5].map((num, index) => (
-                  <img
-                    key={num}
-                    src={`/seal-${num}.webp`}
-                    alt="Wax Seal"
-                    className={clsx(
-                      'absolute inset-0 w-full h-full object-contain transition-opacity duration-150',
-                      sealTaps === index ? 'opacity-100' : 'opacity-0'
-                    )}
-                  />
-                ))}
-                {sealTaps === 0 && (
-                  <motion.div
-                    animate={{ y: [0, -4, 0] }}
-                    transition={{ repeat: Infinity, duration: 1.5, ease: 'easeInOut' }}
-                    className="absolute top-[110%] left-1/2 -translate-x-1/2 mt-3 whitespace-nowrap"
-                  >
-                    <span className="bg-panel/90 backdrop-blur text-champagne text-xs font-sans uppercase tracking-[0.15em] px-4 py-1.5 rounded-sm border border-gold/20">
-                      Tap on the seal to break it open (4×)
-                    </span>
-                  </motion.div>
-                )}
-              </button>
-            </motion.div>
-          )}
-        </AnimatePresence>
+  {step <= 1 && (
+    <motion.div
+      className="absolute inset-0 z-40"
+      animate={step === 1 ? { y: 200, opacity: 0 } : { y: 0, opacity: 1 }}
+      transition={{ duration: step === 1 ? 0.6 : 0.2 }}
+    >
+      {/* Seal */}
+      <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+        <button
+          onClick={handleTapSeal}
+          className="relative w-24 h-24 cursor-pointer drop-shadow-xl pointer-events-auto group"
+        >
+          {[1, 2, 3, 4, 5].map((num, index) => (
+            <img
+              key={num}
+              src={`/seal-${num}.webp`}
+              alt="Wax Seal"
+              className={clsx(
+                'absolute inset-0 w-full h-full object-contain transition-opacity duration-150',
+                sealTaps === index ? 'opacity-100' : 'opacity-0'
+              )}
+            />
+          ))}
+        </button>
+      </div>
 
+      {/* Centered Hint */}
+      {sealTaps === 0 && (
+        <motion.div
+          animate={{ y: [0, -4, 0] }}
+          transition={{
+            repeat: Infinity,
+            duration: 1.5,
+            ease: 'easeInOut',
+          }}
+          className="absolute left-1/2 top-[65%] -translate-x-1/2"
+        >
+          <span className="bg-panel/90 backdrop-blur text-champagne text-xs font-sans uppercase tracking-[0.15em] px-4 py-1.5 rounded-sm border border-gold/20 whitespace-nowrap">
+            Tap on the seal to break it open (4×)
+          </span>
+        </motion.div>
+      )}
+    </motion.div>
+  )}
+</AnimatePresence>
         {/* "Tap to flip" hint after opening */}
         <AnimatePresence>
           {step >= 4 && (
