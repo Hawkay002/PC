@@ -78,7 +78,7 @@ export default function Envelope({ postcardData }) {
           initial={{ rotateX: 0, zIndex: 30 }}
           animate={{
             rotateX: step >= 2 ? 180 : 0,
-            zIndex: step >= 3 ? 0 : 30
+            zIndex: step >= 3 ? 5 : 30 // Now uses 5 instead of 0 to sit smoothly between layers
           }}
           transition={{ duration: 0.8, ease: 'easeInOut' }}
         >
