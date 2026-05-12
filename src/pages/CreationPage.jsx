@@ -158,12 +158,14 @@ export default function CreationPage() {
       setGeneratedLink(`${window.location.origin}/card/${postcardId}`);
       setShowSealingAnim(true);
 
+      // --- TIMING FIX HERE ---
       setTimeout(() => setPackStep(1), 100);
       setTimeout(() => setPackStep(2), 1200);
-      setTimeout(() => setPackStep(3), 2000);
-      setTimeout(() => setPackStep(4), 2800);
-      setTimeout(() => setPackStep(5), 3600);
-      setTimeout(() => setPackStep(6), 4400);
+      setTimeout(() => setPackStep(3), 2000); // Postcard slides up
+      setTimeout(() => setPackStep(4), 2800); // Postcard starts falling
+      setTimeout(() => setPackStep(5), 4500); // Wait 1.7 seconds for card to settle!
+      setTimeout(() => setPackStep(6), 5300); // Drop the wax seal
+      
     } catch (error) {
       console.error(error);
       alert('Failed to send: ' + error.message);
@@ -566,6 +568,7 @@ export default function CreationPage() {
                 animate={{ y: packStep >= 1 ? 0 : '-100vh' }}
                 transition={{ type: 'spring', stiffness: 40, damping: 15 }}
               />
+              
               <motion.div
                 className="absolute inset-0 flex items-center justify-center z-10"
                 initial={{ scale: 0.96, opacity: 0, zIndex: 50 }}
@@ -577,10 +580,11 @@ export default function CreationPage() {
                 }}
                 transition={{ type: 'spring', stiffness: 40, damping: 15 }}
               >
-                <div className="w-full relative shadow-card">
-                  <Postcard data={{ ...formData, previewUrl }} isInteractive={false} forceFlip={false} />
+                <div className="w-full relative">
+                  <Postcard data={{ ...formData, previewUrl }} isInteractive={false} forceFlip={false} showShadow={false} />
                 </div>
               </motion.div>
+              
               <motion.div
                 className="absolute inset-0 z-20 pointer-events-none drop-shadow-sm"
                 initial={{ y: '-100vh' }}
@@ -591,21 +595,28 @@ export default function CreationPage() {
                   <path d="M0,0 L270,220 L540,0 L540,360 L0,360 Z" fill="#F4F1EB" stroke="rgba(0,0,0,0.05)" strokeWidth="1" />
                 </svg>
               </motion.div>
+              
+              {/* --- Z-INDEX SNAPPING FIXED HERE --- */}
               <motion.div
                 className="absolute top-0 left-0 w-full h-full origin-top drop-shadow-md"
                 initial={{ y: '-100vh', rotateX: 0, zIndex: 30 }}
                 animate={{
                   y: packStep >= 1 ? 0 : '-100vh',
                   rotateX: (packStep >= 2 && packStep < 5) ? 180 : 0,
-                  // Delay changing back to 30 until step 5 (after it fully slides in)
                   zIndex: (packStep >= 2 && packStep < 5) ? 5 : 30
                 }}
-                transition={{ duration: 0.8, ease: 'easeInOut' }}
+                transition={{ 
+                  duration: 0.8, 
+                  ease: 'easeInOut',
+                  // Prevents Framer Motion from fading between 5 and 30
+                  zIndex: { duration: 0 } 
+                }}
               >
                 <svg viewBox="0 0 540 360" preserveAspectRatio="none" className="w-full h-full rounded-t-sm">
                   <path d="M0,0 L270,230 L540,0 Z" fill="#F4F1EB" stroke="rgba(0,0,0,0.08)" strokeWidth="1" />
                 </svg>
               </motion.div>
+              
               <motion.img
                 src="/seal-1.webp"
                 alt="Wax Seal"
