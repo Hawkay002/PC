@@ -29,7 +29,7 @@ export default function LandingPage() {
         <div className="absolute bottom-0 right-0 w-[400px] h-[400px] bg-[radial-gradient(ellipse,rgba(200,169,110,0.04)_0%,transparent_70%)]" />
       </div>
 
-      [span_9](start_span){/* Header[span_9](end_span) */}
+      {/* Header[span_9](end_span) */}
       <header className="relative z-10 flex items-center justify-between px-6 lg:px-16 py-6 border-b border-rim/30">
         <div className="flex items-center gap-3">
           <div className="w-1.5 h-5 bg-gradient-to-b from-gold to-gold/20 rounded-full" />
@@ -44,7 +44,7 @@ export default function LandingPage() {
         </Link>
       </header>
 
-      [span_10](start_span){/* Hero[span_10](end_span) */}
+      {/* Hero[span_10](end_span) */}
       <main className="relative z-10 flex flex-col items-center justify-center flex-1 px-6 text-center py-20">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -52,14 +52,14 @@ export default function LandingPage() {
           transition={{ duration: 0.8, ease: 'easeOut' }}
           className="flex flex-col items-center"
         >
-          [span_11](start_span){/* Ornament[span_11](end_span) */}
+        {/* Ornament[span_11](end_span) */}
           <div className="flex items-center gap-4 mb-8">
             <div className="w-16 h-px bg-gradient-to-r from-transparent to-gold/50" />
             <span className="text-gold/60 text-xs tracking-[0.4em] font-sans uppercase">Atelier</span>
             <div className="w-16 h-px bg-gradient-to-l from-transparent to-gold/50" />
           </div>
 
-          [span_12](start_span){/* Title[span_12](end_span) */}
+        {/* Title[span_12](end_span) */}
           <h1 className="font-display text-6xl sm:text-7xl lg:text-8xl font-light text-luminary leading-none mb-4">
             Send moments
           </h1>
@@ -67,12 +67,12 @@ export default function LandingPage() {
             that last forever.
           </h2>
 
-          [span_13](start_span){/* Subtitle[span_13](end_span) */}
+        {/* Subtitle[span_13](end_span) */}
           <p className="text-muted font-sans text-base lg:text-lg font-light max-w-md leading-relaxed mb-12">
             A digital atelier for crafting handcrafted postcards — adorned with botanicals, film filters, and wax seals — delivered by link.
           </p>
 
-          [span_14](start_span){/* CTAs[span_14](end_span) */}
+        {/* CTAs[span_14](end_span) */}
           <div className="flex flex-col sm:flex-row items-center gap-4">
             <Link
               to="/create"
@@ -90,7 +90,7 @@ export default function LandingPage() {
           </div>
         </motion.div>
 
-        [span_15](start_span)[span_16](start_span){/* Decorative Postcard Component[span_15](end_span)[span_16](end_span) */}
+      {/* Decorative Postcard Component[span_15](end_span)[span_16](end_span) */}
         <motion.div
           initial={{ opacity: 0, y: 40, rotate: -1 }}
           animate={{ opacity: 1, y: 0, rotate: -1 }}
@@ -104,7 +104,7 @@ export default function LandingPage() {
           />
         </motion.div>
 
-        [span_17](start_span)[span_18](start_span){/* Features row[span_17](end_span)[span_18](end_span) */}
+      {/* Features row[span_17](end_span)[span_18](end_span) */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -125,7 +125,7 @@ export default function LandingPage() {
           ))}
         </motion.div>
 
-        [span_19](start_span){/* Bottom ornament[span_19](end_span) */}
+    {/* Bottom ornament[span_19](end_span) */}
         <div className="mt-20 flex items-center gap-4">
           <div className="w-12 h-px bg-gradient-to-r from-transparent to-rim/50" />
           <span className="text-muted/40 text-[10px] tracking-[0.3em] font-sans uppercase">Correspondance</span>
@@ -133,7 +133,7 @@ export default function LandingPage() {
         </div>
       </main>
 
-      [span_20](start_span){/* Footer with WhatsApp Link[span_20](end_span) */}
+    {/* Footer with WhatsApp Link[span_20](end_span) */}
       <footer className="relative z-10 shrink-0 py-8 border-t border-rim/30 bg-obsidian/50 backdrop-blur-sm">
         <div className="max-w-7xl mx-auto px-6 flex flex-col items-center justify-center gap-4">
           <div className="flex items-center gap-3">
