@@ -152,7 +152,8 @@ export default function CreationPage() {
   const [generatedLink, setGeneratedLink] = useState('');
   const [copied, setCopied] = useState(false);
   const [packStep, setPackStep] = useState(0);
-  const [alertMessage, setAlertMessage] = useState(''); // NEW STATE FOR MODAL
+  const [alertMessage, setAlertMessage] = useState(''); 
+  const [isProcessingImage, setIsProcessingImage] = useState(false); // ── NEW: IMAGE LOADING STATE ──
 
   const [formData, setFormData] = useState({
     to: '', from: '', message: '', font: 'script',
@@ -171,41 +172,45 @@ export default function CreationPage() {
 
   const onCropComplete = useCallback((_, cap) => setCroppedAreaPixels(cap), []);
 
-    const handleRawImageSelect = async (e) => {
+  const handleRawImageSelect = async (e) => {
     let file = e.target.files?.[0];
     if (!file) return;
 
     const maxSizeInBytes = 50 * 1024 * 1024; // 50 MB
 
+    setIsProcessingImage(true); // ── START LOADING SPINNER ──
+
     // If the file is larger than 50MB, compress it in the browser first
     if (file.size > maxSizeInBytes) {
       try {
         const options = {
-          maxSizeMB: 10,           // Target 10MB or less for smooth cropper performance
-          maxWidthOrHeight: 3840,  // Keep 4K resolution so it still looks incredibly sharp
-          useWebWorker: true       // Prevents the browser from freezing during compression
+          maxSizeMB: 10,           
+          maxWidthOrHeight: 3840,  
+          useWebWorker: true       
         };
-        
         file = await imageCompression(file, options);
         
       } catch (error) {
         console.error("Compression error:", error);
         setAlertMessage('This image is too large and failed to compress. Please try a smaller file.');
         e.target.value = ''; 
+        setIsProcessingImage(false); // ── STOP LOADING SPINNER ──
         return;
       }
     }
 
     const reader = new FileReader();
-    reader.addEventListener('load', () => setRawImageSrc(reader.result));
+    reader.addEventListener('load', () => {
+      setRawImageSrc(reader.result);
+      setIsProcessingImage(false); // ── STOP LOADING ONCE READ IS COMPLETE ──
+    });
     reader.readAsDataURL(file);
     
-    // Clear input value so selecting the same file again works
     e.target.value = ''; 
   };
 
-
   const handleSaveCrop = async () => {
+    setIsProcessingImage(true); // ── START LOADING SPINNER ──
     try {
       const croppedImageFile = await getCroppedImg(rawImageSrc, croppedAreaPixels, rotation, flip);
       setPreviewUrl(URL.createObjectURL(croppedImageFile));
@@ -215,6 +220,8 @@ export default function CreationPage() {
       setFlip({ horizontal: false, vertical: false });
     } catch (e) {
       console.error(e);
+    } finally {
+      setIsProcessingImage(false); // ── STOP LOADING SPINNER ──
     }
   };
 
@@ -227,7 +234,6 @@ export default function CreationPage() {
   };
 
   const submitPostcard = async () => {
-    // UPDATED ALERTS
     if (!imageFile) return setAlertMessage('Please add a photo to the back of your postcard.');
     if (!formData.message) return setAlertMessage('Please write a lovely message before sending.');
 
@@ -923,7 +929,31 @@ export default function CreationPage() {
         )}
       </AnimatePresence>
 
-      {/* ── NEW: Custom Alert Warning Modal ── */}
+      {/* ── NEW: Image Processing Loading Modal ── */}
+      <AnimatePresence>
+        {isProcessingImage && (
+          <motion.div
+            key="processing-modal"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[300] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4"
+          >
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              className="bg-panel border border-gold/20 p-8 rounded-sm shadow-2xl flex flex-col items-center text-center max-w-sm w-full"
+            >
+              <Loader2 className="w-8 h-8 text-gold animate-spin mb-4" />
+              <h3 className="font-display text-xl font-light italic text-luminary mb-2">Processing Image</h3>
+              <p className="text-muted text-xs font-sans">This might take a moment...</p>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Alert Warning Modal */}
       <AnimatePresence>
         {alertMessage && (
           <motion.div
