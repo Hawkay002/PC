@@ -240,7 +240,7 @@ export default function Envelope({ postcardData }) {
                   {[1, 2, 3, 4, 5].map((num, index) => (
                     <img
                       key={num}
-                      src={`/seal-${num}.webp`}
+                      src={`/waxseal-${num}.webp`}
                       alt="Wax Seal"
                       className={clsx(
                         'absolute inset-0 w-full h-full object-contain transition-opacity duration-150',
