@@ -29,6 +29,7 @@ function BotanicalDefs({ id }) {
         <ellipse cx="35" cy="25" rx="2.2" ry="4.5" transform="rotate(45 35 25)" fill="#B86B50" opacity="0.6" />
         <ellipse cx="25" cy="35" rx="2.2" ry="4.5" transform="rotate(45 25 35)" fill="#B86B50" opacity="0.6" />
         <ellipse cx="35" cy="35" rx="2.2" ry="4.5" transform="rotate(-45 35 35)" fill="#B86B50" opacity="0.6" />
+        
         <circle cx="30" cy="30" r="4" fill="#C8A96E" opacity="0.95" />
         <circle cx="30" cy="30" r="2.2" fill="#EDE5D0" />
         <circle cx="30" cy="30" r="1" fill="#C8A96E" opacity="0.7" />
@@ -155,6 +156,7 @@ export default function CreationPage() {
 
   const [crop, setCrop] = useState({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(1);
+  const [rotation, setRotation] = useState(0);
   const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
 
   const onCropComplete = useCallback((_, cap) => setCroppedAreaPixels(cap), []);
@@ -168,10 +170,11 @@ export default function CreationPage() {
 
   const handleSaveCrop = async () => {
     try {
-      const croppedImageFile = await getCroppedImg(rawImageSrc, croppedAreaPixels);
+      const croppedImageFile = await getCroppedImg(rawImageSrc, croppedAreaPixels, rotation);
       setPreviewUrl(URL.createObjectURL(croppedImageFile));
       setImageFile(croppedImageFile);
       setRawImageSrc(null);
+      setRotation(0);
     } catch (e) {
       console.error(e);
     }
@@ -579,7 +582,7 @@ export default function CreationPage() {
             <div className="bg-panel border border-rim rounded-sm w-full max-w-2xl overflow-hidden flex flex-col h-[80vh]">
               <div className="p-4 border-b border-rim flex justify-between items-center">
                 <h3 className="font-display text-xl font-light italic text-luminary">Frame your photo</h3>
-                <button onClick={() => setRawImageSrc(null)} className="text-muted hover:text-luminary text-sm font-sans transition-colors">
+                <button onClick={() => { setRawImageSrc(null); setRotation(0); }} className="text-muted hover:text-luminary text-sm font-sans transition-colors">
                   Cancel
                 </button>
               </div>
@@ -588,16 +591,31 @@ export default function CreationPage() {
                   image={rawImageSrc}
                   crop={crop}
                   zoom={zoom}
+                  rotation={rotation}
                   aspect={3 / 2}
                   onCropChange={setCrop}
                   onCropComplete={onCropComplete}
                   onZoomChange={setZoom}
+                  onRotationChange={setRotation}
                 />
               </div>
-              <div className="p-5 border-t border-rim flex justify-end">
+              <div className="p-5 border-t border-rim flex flex-col sm:flex-row gap-4 justify-between items-center bg-charcoal/30">
+                <div className="flex items-center gap-3 w-full sm:w-auto">
+                  <span className="text-xs font-sans uppercase tracking-[0.15em] text-muted">Rotate</span>
+                  <input
+                    type="range"
+                    value={rotation}
+                    min={0}
+                    max={360}
+                    step={1}
+                    onChange={(e) => setRotation(Number(e.target.value))}
+                    className="w-full sm:w-48 h-1 bg-rim rounded-lg appearance-none cursor-pointer accent-gold"
+                  />
+                  <span className="text-xs font-sans text-muted w-8 text-right">{rotation}°</span>
+                </div>
                 <button
                   onClick={handleSaveCrop}
-                  className="bg-gradient-to-r from-gold/90 to-champagne/80 text-obsidian px-8 py-2.5 rounded-sm font-sans font-medium text-sm hover:from-gold hover:to-champagne transition-all"
+                  className="w-full sm:w-auto bg-gradient-to-r from-gold/90 to-champagne/80 text-obsidian px-8 py-2.5 rounded-sm font-sans font-medium text-sm hover:from-gold hover:to-champagne transition-all"
                 >
                   Apply
                 </button>
@@ -632,6 +650,7 @@ export default function CreationPage() {
                 setPreviewUrl('');
                 setImageFile(null);
                 setRawImageSrc(null);
+                setRotation(0);
 
                 setFormData({
                   to: '',
