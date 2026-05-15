@@ -135,7 +135,7 @@ export default function Envelope({ postcardData }) {
               src="/waxseal-5.webp"
               alt="Broken Wax Seal Remnant"
               // Changed -bottom-2 to -bottom-6 and drop-shadow-md to drop-shadow-xl
-              className="absolute -bottom-6 left-[6%] -translate-x-1/2 -rotate-[25deg] w-24 h-24 object-contain z-20 pointer-events-none drop-shadow-xl"
+              className="absolute -bottom-10 left-[5%] -translate-x-1/2 -rotate-[25deg] w-24 h-24 object-contain z-20 pointer-events-none drop-shadow-xl"
               initial={{ opacity: 0 }}
               animate={{ opacity: step >= 4 ? 1 : 0 }}
               transition={{ duration: 0.5, delay: 1.6, ease: 'easeIn' }}
