@@ -1,19 +1,69 @@
-export default async function getCroppedImg(imageSrc, pixelCrop) {
-  const image = await new Promise((resolve, reject) => {
-    const img = new Image();
-    img.addEventListener('load', () => resolve(img));
-    img.addEventListener('error', (error) => reject(error));
-    img.src = imageSrc;
+const createImage = (url) =>
+  new Promise((resolve, reject) => {
+    const image = new Image();
+    image.addEventListener('load', () => resolve(image));
+    image.addEventListener('error', (error) => reject(error));
+    image.setAttribute('crossOrigin', 'anonymous'); // Needed to avoid CORS issues
+    image.src = url;
   });
 
+function getRadianAngle(degreeValue) {
+  return (degreeValue * Math.PI) / 180;
+}
+
+// Returns the new bounding area of a rotated rectangle
+function rotateSize(width, height, rotation) {
+  const rotRad = getRadianAngle(rotation);
+  return {
+    width: Math.abs(Math.cos(rotRad) * width) + Math.abs(Math.sin(rotRad) * height),
+    height: Math.abs(Math.sin(rotRad) * width) + Math.abs(Math.cos(rotRad) * height),
+  };
+}
+
+export default async function getCroppedImg(
+  imageSrc,
+  pixelCrop,
+  rotation = 0
+) {
+  const image = await createImage(imageSrc);
   const canvas = document.createElement('canvas');
   const ctx = canvas.getContext('2d');
 
-  canvas.width = pixelCrop.width;
-  canvas.height = pixelCrop.height;
+  if (!ctx) return null;
 
-  ctx.drawImage(
-    image,
+  const rotRad = getRadianAngle(rotation);
+
+  // Calculate bounding box of the rotated image
+  const { width: bBoxWidth, height: bBoxHeight } = rotateSize(
+    image.width,
+    image.height,
+    rotation
+  );
+
+  // Set canvas size to match the bounding box
+  canvas.width = bBoxWidth;
+  canvas.height = bBoxHeight;
+
+  // Translate canvas context to a central location to allow rotating around the center
+  ctx.translate(bBoxWidth / 2, bBoxHeight / 2);
+  ctx.rotate(rotRad);
+  ctx.translate(-image.width / 2, -image.height / 2);
+
+  // Draw rotated image
+  ctx.drawImage(image, 0, 0);
+
+  const croppedCanvas = document.createElement('canvas');
+  const croppedCtx = croppedCanvas.getContext('2d');
+
+  if (!croppedCtx) return null;
+
+  // Set the size of the cropped canvas
+  croppedCanvas.width = pixelCrop.width;
+  croppedCanvas.height = pixelCrop.height;
+
+  // Draw the cropped area onto the new canvas
+  croppedCtx.drawImage(
+    canvas,
     pixelCrop.x,
     pixelCrop.y,
     pixelCrop.width,
@@ -24,8 +74,12 @@ export default async function getCroppedImg(imageSrc, pixelCrop) {
     pixelCrop.height
   );
 
-  return new Promise((resolve) => {
-    canvas.toBlob((blob) => {
+  return new Promise((resolve, reject) => {
+    croppedCanvas.toBlob((blob) => {
+      if (!blob) {
+        reject(new Error('Canvas is empty'));
+        return;
+      }
       resolve(new File([blob], 'cropped.jpg', { type: 'image/jpeg' }));
     }, 'image/jpeg');
   });
