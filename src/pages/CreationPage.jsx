@@ -171,14 +171,39 @@ export default function CreationPage() {
 
   const onCropComplete = useCallback((_, cap) => setCroppedAreaPixels(cap), []);
 
-  const handleRawImageSelect = (e) => {
-    const file = e.target.files?.[0];
+    const handleRawImageSelect = async (e) => {
+    let file = e.target.files?.[0];
     if (!file) return;
+
+    const maxSizeInBytes = 50 * 1024 * 1024; // 50 MB
+
+    // If the file is larger than 50MB, compress it in the browser first
+    if (file.size > maxSizeInBytes) {
+      try {
+        const options = {
+          maxSizeMB: 10,           // Target 10MB or less for smooth cropper performance
+          maxWidthOrHeight: 3840,  // Keep 4K resolution so it still looks incredibly sharp
+          useWebWorker: true       // Prevents the browser from freezing during compression
+        };
+        
+        file = await imageCompression(file, options);
+        
+      } catch (error) {
+        console.error("Compression error:", error);
+        setAlertMessage('This image is too large and failed to compress. Please try a smaller file.');
+        e.target.value = ''; 
+        return;
+      }
+    }
+
     const reader = new FileReader();
     reader.addEventListener('load', () => setRawImageSrc(reader.result));
     reader.readAsDataURL(file);
+    
+    // Clear input value so selecting the same file again works
     e.target.value = ''; 
   };
+
 
   const handleSaveCrop = async () => {
     try {
