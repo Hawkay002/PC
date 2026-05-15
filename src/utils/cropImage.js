@@ -3,7 +3,7 @@ const createImage = (url) =>
     const image = new Image();
     image.addEventListener('load', () => resolve(image));
     image.addEventListener('error', (error) => reject(error));
-    image.setAttribute('crossOrigin', 'anonymous'); // Needed to avoid CORS issues
+    image.setAttribute('crossOrigin', 'anonymous');
     image.src = url;
   });
 
@@ -11,7 +11,6 @@ function getRadianAngle(degreeValue) {
   return (degreeValue * Math.PI) / 180;
 }
 
-// Returns the new bounding area of a rotated rectangle
 function rotateSize(width, height, rotation) {
   const rotRad = getRadianAngle(rotation);
   return {
@@ -34,24 +33,21 @@ export default async function getCroppedImg(
 
   const rotRad = getRadianAngle(rotation);
 
-  // Calculate bounding box of the rotated image
   const { width: bBoxWidth, height: bBoxHeight } = rotateSize(
     image.width,
     image.height,
     rotation
   );
 
-  // Set canvas size to match the bounding box
   canvas.width = bBoxWidth;
   canvas.height = bBoxHeight;
 
-  // Translate canvas context to a central location to allow rotating and flipping around the center
+  // Translate canvas context to a central location to allow rotating
   ctx.translate(bBoxWidth / 2, bBoxHeight / 2);
   ctx.rotate(rotRad);
-  ctx.scale(flip.horizontal ? -1 : 1, flip.vertical ? -1 : 1);
   ctx.translate(-image.width / 2, -image.height / 2);
 
-  // Draw rotated & flipped image
+  // Draw rotated image
   ctx.drawImage(image, 0, 0);
 
   const croppedCanvas = document.createElement('canvas');
@@ -62,6 +58,11 @@ export default async function getCroppedImg(
   // Set the size of the cropped canvas
   croppedCanvas.width = pixelCrop.width;
   croppedCanvas.height = pixelCrop.height;
+
+  // Apply flip strictly to the final extracted output
+  croppedCtx.translate(pixelCrop.width / 2, pixelCrop.height / 2);
+  croppedCtx.scale(flip.horizontal ? -1 : 1, flip.vertical ? -1 : 1);
+  croppedCtx.translate(-pixelCrop.width / 2, -pixelCrop.height / 2);
 
   // Draw the cropped area onto the new canvas
   croppedCtx.drawImage(
