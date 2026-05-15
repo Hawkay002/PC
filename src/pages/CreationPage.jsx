@@ -152,6 +152,7 @@ export default function CreationPage() {
   const [generatedLink, setGeneratedLink] = useState('');
   const [copied, setCopied] = useState(false);
   const [packStep, setPackStep] = useState(0);
+  const [alertMessage, setAlertMessage] = useState(''); // NEW STATE FOR MODAL
 
   const [formData, setFormData] = useState({
     to: '', from: '', message: '', font: 'script',
@@ -176,7 +177,6 @@ export default function CreationPage() {
     const reader = new FileReader();
     reader.addEventListener('load', () => setRawImageSrc(reader.result));
     reader.readAsDataURL(file);
-    // Fix: Clear input value so selecting the same file again works
     e.target.value = ''; 
   };
 
@@ -197,14 +197,14 @@ export default function CreationPage() {
     setImageFile(null);
     setPreviewUrl('');
     setFormData({ ...formData, image_filter: '' });
-    // Fix: Ensure refs are cleared so discard perfectly resets the input states
     if (fileInputRef.current) fileInputRef.current.value = '';
     if (cameraInputRef.current) cameraInputRef.current.value = '';
   };
 
   const submitPostcard = async () => {
-    if (!imageFile) return alert('Please add a photo.');
-    if (!formData.message) return alert('Please write a message.');
+    // UPDATED ALERTS
+    if (!imageFile) return setAlertMessage('Please add a photo to the back of your postcard.');
+    if (!formData.message) return setAlertMessage('Please write a lovely message before sending.');
 
     setIsSubmitting(true);
     try {
@@ -243,7 +243,7 @@ export default function CreationPage() {
       
     } catch (error) {
       console.error(error);
-      alert('Failed to send: ' + error.message);
+      setAlertMessage('Failed to send: ' + error.message);
     } finally {
       setIsSubmitting(false);
     }
@@ -625,7 +625,6 @@ export default function CreationPage() {
               </div>
               
               <div className="p-5 border-t border-rim flex flex-col sm:flex-row gap-4 justify-between items-center bg-charcoal/30">
-                {/* ── NEW: Interactive Hugeicons Toolbar ── */}
                 <div className="flex items-center gap-2 w-full sm:w-auto">
                   <button
                     type="button"
@@ -893,6 +892,43 @@ export default function CreationPage() {
                 className="text-xs font-sans text-muted hover:text-champagne transition-colors underline underline-offset-4"
               >
                 View your outbox
+              </button>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* ── NEW: Custom Alert Warning Modal ── */}
+      <AnimatePresence>
+        {alertMessage && (
+          <motion.div
+            key="alert-modal"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[200] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4"
+          >
+            <motion.div
+              initial={{ scale: 0.95, y: 10, opacity: 0 }}
+              animate={{ scale: 1, y: 0, opacity: 1 }}
+              exit={{ scale: 0.95, y: 10, opacity: 0 }}
+              className="bg-panel border border-gold/20 p-6 sm:p-8 rounded-sm shadow-2xl flex flex-col items-center text-center max-w-sm w-full relative"
+            >
+              {/* Gold ornament */}
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-8 h-px bg-gradient-to-r from-transparent to-gold/60" />
+                <span className="text-gold/60 text-sm">✦</span>
+                <div className="w-8 h-px bg-gradient-to-l from-transparent to-gold/60" />
+              </div>
+              
+              <h3 className="font-display text-2xl font-light italic text-luminary mb-3">Notice</h3>
+              <p className="text-muted text-sm mb-8 font-sans">{alertMessage}</p>
+              
+              <button
+                onClick={() => setAlertMessage('')}
+                className="w-full bg-gradient-to-r from-gold/90 to-champagne/80 text-obsidian px-6 py-2.5 rounded-sm font-sans font-medium text-sm hover:from-gold hover:to-champagne transition-all"
+              >
+                Understood
               </button>
             </motion.div>
           </motion.div>
