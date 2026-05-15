@@ -170,16 +170,18 @@ export default function CreationPage() {
 
   const onCropComplete = useCallback((_, cap) => setCroppedAreaPixels(cap), []);
 
-  const handleRawImageSelect = (file) => {
+  const handleRawImageSelect = (e) => {
+    const file = e.target.files?.[0];
     if (!file) return;
     const reader = new FileReader();
     reader.addEventListener('load', () => setRawImageSrc(reader.result));
     reader.readAsDataURL(file);
+    // Fix: Clear input value so selecting the same file again works
+    e.target.value = ''; 
   };
 
   const handleSaveCrop = async () => {
     try {
-      // Pass the flip state to correctly process the flipped crop mathematically
       const croppedImageFile = await getCroppedImg(rawImageSrc, croppedAreaPixels, rotation, flip);
       setPreviewUrl(URL.createObjectURL(croppedImageFile));
       setImageFile(croppedImageFile);
@@ -195,6 +197,9 @@ export default function CreationPage() {
     setImageFile(null);
     setPreviewUrl('');
     setFormData({ ...formData, image_filter: '' });
+    // Fix: Ensure refs are cleared so discard perfectly resets the input states
+    if (fileInputRef.current) fileInputRef.current.value = '';
+    if (cameraInputRef.current) cameraInputRef.current.value = '';
   };
 
   const submitPostcard = async () => {
@@ -229,13 +234,12 @@ export default function CreationPage() {
       setGeneratedLink(`${window.location.origin}/card/${postcardId}`);
       setShowSealingAnim(true);
 
-      // --- TIMING FIX HERE ---
       setTimeout(() => setPackStep(1), 100);
       setTimeout(() => setPackStep(2), 1200);
-      setTimeout(() => setPackStep(3), 2000); // Postcard slides up
-      setTimeout(() => setPackStep(4), 2800); // Postcard starts falling
-      setTimeout(() => setPackStep(5), 4500); // Wait 1.7 seconds for card to settle!
-      setTimeout(() => setPackStep(6), 5300); // Drop the wax seal
+      setTimeout(() => setPackStep(3), 2000); 
+      setTimeout(() => setPackStep(4), 2800); 
+      setTimeout(() => setPackStep(5), 4500); 
+      setTimeout(() => setPackStep(6), 5300); 
       
     } catch (error) {
       console.error(error);
@@ -407,7 +411,7 @@ export default function CreationPage() {
                         <Upload className="w-5 h-5 text-muted group-hover:text-gold transition-colors" />
                         <span className="text-xs font-sans uppercase tracking-[0.15em] text-muted group-hover:text-champagne">Upload</span>
                       </button>
-                      <input type="file" ref={fileInputRef} className="hidden" accept="image/*" onChange={(e) => handleRawImageSelect(e.target.files[0])} />
+                      <input type="file" ref={fileInputRef} className="hidden" accept="image/*" onChange={handleRawImageSelect} />
 
                       <button
                         type="button"
@@ -417,7 +421,7 @@ export default function CreationPage() {
                         <Camera className="w-5 h-5 text-muted group-hover:text-gold transition-colors" />
                         <span className="text-xs font-sans uppercase tracking-[0.15em] text-muted group-hover:text-champagne">Camera</span>
                       </button>
-                      <input type="file" ref={cameraInputRef} className="hidden" accept="image/*" capture="environment" onChange={(e) => handleRawImageSelect(e.target.files[0])} />
+                      <input type="file" ref={cameraInputRef} className="hidden" accept="image/*" capture="environment" onChange={handleRawImageSelect} />
                     </div>
 
                     {/* Filter strip */}
@@ -597,23 +601,27 @@ export default function CreationPage() {
                   Cancel
                 </button>
               </div>
-              <div className="flex-1 relative bg-obsidian">
-                <Cropper
-                  image={rawImageSrc}
-                  crop={crop}
-                  zoom={zoom}
-                  rotation={rotation}
-                  aspect={3 / 2}
-                  onCropChange={setCrop}
-                  onCropComplete={onCropComplete}
-                  onZoomChange={setZoom}
-                  onRotationChange={setRotation}
+              
+              <div className="flex-1 relative bg-obsidian overflow-hidden">
+                <div 
+                  className="absolute inset-0"
                   style={{
-                    mediaStyle: {
-                      scale: `${flip.horizontal ? -1 : 1} ${flip.vertical ? -1 : 1}`
-                    }
+                    transform: `scaleX(${flip.horizontal ? -1 : 1}) scaleY(${flip.vertical ? -1 : 1})`,
+                    transformOrigin: 'center'
                   }}
-                />
+                >
+                  <Cropper
+                    image={rawImageSrc}
+                    crop={crop}
+                    zoom={zoom}
+                    rotation={rotation}
+                    aspect={3 / 2}
+                    onCropChange={setCrop}
+                    onCropComplete={onCropComplete}
+                    onZoomChange={setZoom}
+                    onRotationChange={setRotation}
+                  />
+                </div>
               </div>
               
               <div className="p-5 border-t border-rim flex flex-col sm:flex-row gap-4 justify-between items-center bg-charcoal/30">
@@ -621,7 +629,10 @@ export default function CreationPage() {
                 <div className="flex items-center gap-2 w-full sm:w-auto">
                   <button
                     type="button"
-                    onClick={() => setRotation(r => r - 90)}
+                    onClick={() => {
+                      const direction = (flip.horizontal ? -1 : 1) * (flip.vertical ? -1 : 1);
+                      setRotation(r => r - 90 * direction);
+                    }}
                     className="w-10 h-10 flex items-center justify-center bg-charcoal hover:bg-surface border border-rim rounded-sm text-muted hover:text-champagne transition-colors"
                     title="Rotate 90° CCW"
                   >
@@ -629,7 +640,10 @@ export default function CreationPage() {
                   </button>
                   <button
                     type="button"
-                    onClick={() => setRotation(r => r + 90)}
+                    onClick={() => {
+                      const direction = (flip.horizontal ? -1 : 1) * (flip.vertical ? -1 : 1);
+                      setRotation(r => r + 90 * direction);
+                    }}
                     className="w-10 h-10 flex items-center justify-center bg-charcoal hover:bg-surface border border-rim rounded-sm text-muted hover:text-champagne transition-colors"
                     title="Rotate 90° CW"
                   >
