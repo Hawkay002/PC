@@ -133,7 +133,7 @@ export default function Envelope({ postcardData }) {
             <motion.img
               src="/waxseal-5.webp"
               alt="Broken Wax Seal Remnant"
-              className="absolute -bottom-2 left-[16%] -translate-x-1/2 -rotate-[25deg] w-24 h-24 object-contain z-20 pointer-events-none drop-shadow-md"
+              className="absolute -bottom-2 left-[10%] -translate-x-1/2 -rotate-[25deg] w-24 h-24 object-contain z-20 pointer-events-none drop-shadow-md"
               initial={{ opacity: 0 }}
               animate={{ opacity: step >= 4 ? 1 : 0 }}
               transition={{ duration: 0.6, delay: 0.8, ease: 'easeIn' }}
