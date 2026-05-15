@@ -650,118 +650,120 @@ export default function CreationPage() {
             
             <div className="relative w-full max-w-lg aspect-[3/2] perspective-1000 mb-32">
               
-              {/* ── ENVELOPE MASTER WRAPPER ── */}
+              {/* ── ENVELOPE BODY — botanical inside lining ── */}
               <motion.div
-                className="absolute inset-0 w-full h-full"
+                className="absolute inset-0 shadow-envelope rounded-sm overflow-hidden"
+                initial={{ y: '-100vh', zIndex: 0 }}
+                animate={{ y: packStep >= 1 ? 0 : '-100vh' }}
+                transition={{ type: 'spring', stiffness: 40, damping: 15 }}
+              >
+                <div className="absolute inset-0 bg-[#EAE5DC]" />
+                <svg
+                  className="absolute inset-0 w-full h-full"
+                  viewBox="0 0 540 360"
+                  preserveAspectRatio="none"
+                >
+                  <BotanicalDefs id="bodyPat-anim" />
+                  <rect width="540" height="360" fill="url(#bodyPat-anim)" opacity="0.88" />
+                  <line x1="0" y1="0" x2="270" y2="220" stroke={GOLD} strokeWidth="1.2" opacity="0.35" />
+                  <line x1="540" y1="0" x2="270" y2="220" stroke={GOLD} strokeWidth="1.2" opacity="0.35" />
+                </svg>
+                <div
+                  className="absolute inset-0 pointer-events-none rounded-sm"
+                  style={{ boxShadow: `inset 0 0 0 1.5px rgba(200,169,110,0.4), inset 0 0 0 3.5px rgba(200,169,110,0.12)` }}
+                />
+              </motion.div>
+              
+              {/* ── POSTCARD ── */}
+              <motion.div
+                className="absolute inset-0 flex items-center justify-center z-10"
+                initial={{ scale: 0.96, opacity: 0, zIndex: 50 }}
+                animate={{
+                  scale: 0.96,
+                  opacity: 1,
+                  y: packStep === 3 ? '-110%' : 0,
+                  zIndex: packStep >= 4 ? 10 : 50
+                }}
+                transition={{ type: 'spring', stiffness: 40, damping: 15 }}
+              >
+                <div className="w-full relative">
+                  <Postcard data={{ ...formData, previewUrl }} isInteractive={false} forceFlip={false} showShadow={false} />
+                </div>
+              </motion.div>
+              
+              {/* ── BOTTOM FLAP — outside face with gold borders ── */}
+              <motion.div
+                className="absolute inset-0 w-full h-full z-20 pointer-events-none drop-shadow-sm"
                 initial={{ y: '-100vh' }}
                 animate={{ y: packStep >= 1 ? 0 : '-100vh' }}
                 transition={{ type: 'spring', stiffness: 40, damping: 15 }}
               >
-                {/* ── ENVELOPE BODY — botanical inside lining ── */}
-                <div className="absolute inset-0 shadow-envelope rounded-sm overflow-hidden">
-                  <div className="absolute inset-0 bg-[#EAE5DC]" />
-                  <svg
-                    className="absolute inset-0 w-full h-full"
-                    viewBox="0 0 540 360"
-                    preserveAspectRatio="none"
-                  >
-                    <BotanicalDefs id="bodyPat-anim" />
-                    <rect width="540" height="360" fill="url(#bodyPat-anim)" opacity="0.88" />
-                    <line x1="0" y1="0" x2="270" y2="220" stroke={GOLD} strokeWidth="1.2" opacity="0.35" />
-                    <line x1="540" y1="0" x2="270" y2="220" stroke={GOLD} strokeWidth="1.2" opacity="0.35" />
-                  </svg>
-                  <div
-                    className="absolute inset-0 pointer-events-none rounded-sm"
-                    style={{ boxShadow: `inset 0 0 0 1.5px rgba(200,169,110,0.4), inset 0 0 0 3.5px rgba(200,169,110,0.12)` }}
-                  />
-                </div>
-                
-                {/* ── POSTCARD ── */}
-                <motion.div
-                  className="absolute inset-0 flex items-center justify-center z-10"
-                  initial={{ scale: 0.96, opacity: 0, zIndex: 50 }}
-                  animate={{
-                    scale: 0.96,
-                    opacity: 1,
-                    y: packStep === 3 ? '-110%' : 0,
-                    zIndex: packStep >= 4 ? 10 : 50
-                  }}
-                  transition={{ type: 'spring', stiffness: 40, damping: 15 }}
+                <svg viewBox="0 0 540 360" preserveAspectRatio="none" className="w-full h-full rounded-b-sm overflow-hidden">
+                  <BotanicalDefs id="btmPat-anim" />
+                  <path d="M0,0 L270,220 L540,0 L540,360 L0,360 Z" fill="#F0EBE1" />
+                  <path d="M0,0 L270,220 L540,0 L540,360 L0,360 Z" fill="url(#btmPat-anim)" opacity="0.12" />
+                  <path d="M2,0 L270,218 L538,0" fill="none" stroke={GOLD2} strokeWidth="0.8" opacity="0.55" />
+                  <path d="M0,0 L270,220 L540,0" fill="none" stroke={GOLD} strokeWidth="2.2" opacity="0.85" />
+                  <path d="M14,0 L270,208 L526,0" fill="none" stroke={GOLD} strokeWidth="0.7" opacity="0.3" />
+                  <path d="M0,360 L270,222 L540,360" fill="none" stroke={GOLD} strokeWidth="1.2" opacity="0.28" />
+                  <rect x="1.5" y="1.5" width="537" height="357" fill="none" stroke={GOLD} strokeWidth="1.5" opacity="0.3" rx="1" />
+                </svg>
+              </motion.div>
+              
+              {/* ── TOP FLAP — outside + inside botanical revealed on open ── */}
+              <motion.div
+                className="absolute top-0 left-0 w-full h-full origin-top drop-shadow-md"
+                style={{ transformStyle: 'preserve-3d' }}
+                initial={{ y: '-100vh', rotateX: 0, zIndex: 30 }}
+                animate={{
+                  y: packStep >= 1 ? 0 : '-100vh',
+                  rotateX: (packStep >= 2 && packStep < 5) ? 180 : 0,
+                  zIndex: (packStep >= 2 && packStep < 5) ? 5 : 30
+                }}
+                transition={{ 
+                  y: { type: 'spring', stiffness: 40, damping: 15 },
+                  rotateX: { duration: 0.8, ease: 'easeInOut' },
+                  zIndex: { duration: 0 } 
+                }}
+              >
+                {/* OUTSIDE face of top flap */}
+                <svg
+                  viewBox="0 0 540 360"
+                  preserveAspectRatio="none"
+                  className="absolute inset-0 w-full h-full rounded-t-sm"
+                  style={{ backfaceVisibility: 'hidden', WebkitBackfaceVisibility: 'hidden' }}
                 >
-                  <div className="w-full relative">
-                    <Postcard data={{ ...formData, previewUrl }} isInteractive={false} forceFlip={false} showShadow={false} />
-                  </div>
-                </motion.div>
-                
-                {/* ── BOTTOM FLAP — outside face with gold borders ── */}
-                <div className="absolute inset-0 w-full h-full z-20 pointer-events-none drop-shadow-sm">
-                  <svg viewBox="0 0 540 360" preserveAspectRatio="none" className="w-full h-full rounded-b-sm overflow-hidden">
-                    <BotanicalDefs id="btmPat-anim" />
-                    <path d="M0,0 L270,220 L540,0 L540,360 L0,360 Z" fill="#F0EBE1" />
-                    <path d="M0,0 L270,220 L540,0 L540,360 L0,360 Z" fill="url(#btmPat-anim)" opacity="0.12" />
-                    <path d="M2,0 L270,218 L538,0" fill="none" stroke={GOLD2} strokeWidth="0.8" opacity="0.55" />
-                    <path d="M0,0 L270,220 L540,0" fill="none" stroke={GOLD} strokeWidth="2.2" opacity="0.85" />
-                    <path d="M14,0 L270,208 L526,0" fill="none" stroke={GOLD} strokeWidth="0.7" opacity="0.3" />
-                    <path d="M0,360 L270,222 L540,360" fill="none" stroke={GOLD} strokeWidth="1.2" opacity="0.28" />
-                    <rect x="1.5" y="1.5" width="537" height="357" fill="none" stroke={GOLD} strokeWidth="1.5" opacity="0.3" rx="1" />
-                  </svg>
-                </div>
-                
-                {/* ── TOP FLAP — outside + inside botanical revealed on open ── */}
-                <motion.div
-                  className="absolute top-0 left-0 w-full h-full origin-top drop-shadow-md"
-                  style={{ transformStyle: 'preserve-3d' }}
-                  initial={{ rotateX: 0, zIndex: 30 }}
-                  animate={{
-                    rotateX: (packStep >= 2 && packStep < 5) ? 180 : 0,
-                    zIndex: (packStep >= 2 && packStep < 5) ? 5 : 30
-                  }}
-                  transition={{ 
-                    duration: 0.8, 
-                    ease: 'easeInOut',
-                    // Prevents Framer Motion from fading between 5 and 30
-                    zIndex: { duration: 0 } 
-                  }}
-                >
-                  {/* OUTSIDE face of top flap */}
-                  <svg
-                    viewBox="0 0 540 360"
-                    preserveAspectRatio="none"
-                    className="absolute inset-0 w-full h-full rounded-t-sm"
-                    style={{ backfaceVisibility: 'hidden', WebkitBackfaceVisibility: 'hidden' }}
-                  >
-                    <BotanicalDefs id="flapOutPat-anim" />
-                    <path d="M0,0 L270,230 L540,0 Z" fill="#F0EBE1" />
-                    <path d="M0,0 L270,230 L540,0 Z" fill="url(#flapOutPat-anim)" opacity="0.10" />
-                    <path d="M2,0 L270,228" fill="none" stroke={GOLD2} strokeWidth="0.9" opacity="0.6" />
-                    <path d="M0,0 L270,230" fill="none" stroke={GOLD} strokeWidth="2.8" opacity="0.88" />
-                    <path d="M538,0 L270,228" fill="none" stroke={GOLD2} strokeWidth="0.9" opacity="0.6" />
-                    <path d="M540,0 L270,230" fill="none" stroke={GOLD} strokeWidth="2.8" opacity="0.88" />
-                    <path d="M16,0 L270,216" fill="none" stroke={GOLD} strokeWidth="0.8" opacity="0.28" />
-                    <path d="M524,0 L270,216" fill="none" stroke={GOLD} strokeWidth="0.8" opacity="0.28" />
-                    <line x1="0" y1="1" x2="540" y2="1" stroke={GOLD} strokeWidth="1.8" opacity="0.45" />
-                    <line x1="0" y1="5" x2="540" y2="5" stroke={GOLD} strokeWidth="0.6" opacity="0.22" />
-                  </svg>
+                  <BotanicalDefs id="flapOutPat-anim" />
+                  <path d="M0,0 L270,230 L540,0 Z" fill="#F0EBE1" />
+                  <path d="M0,0 L270,230 L540,0 Z" fill="url(#flapOutPat-anim)" opacity="0.10" />
+                  <path d="M2,0 L270,228" fill="none" stroke={GOLD2} strokeWidth="0.9" opacity="0.6" />
+                  <path d="M0,0 L270,230" fill="none" stroke={GOLD} strokeWidth="2.8" opacity="0.88" />
+                  <path d="M538,0 L270,228" fill="none" stroke={GOLD2} strokeWidth="0.9" opacity="0.6" />
+                  <path d="M540,0 L270,230" fill="none" stroke={GOLD} strokeWidth="2.8" opacity="0.88" />
+                  <path d="M16,0 L270,216" fill="none" stroke={GOLD} strokeWidth="0.8" opacity="0.28" />
+                  <path d="M524,0 L270,216" fill="none" stroke={GOLD} strokeWidth="0.8" opacity="0.28" />
+                  <line x1="0" y1="1" x2="540" y2="1" stroke={GOLD} strokeWidth="1.8" opacity="0.45" />
+                  <line x1="0" y1="5" x2="540" y2="5" stroke={GOLD} strokeWidth="0.6" opacity="0.22" />
+                </svg>
 
-                  {/* INSIDE face — full botanical lining revealed when flap opens */}
-                  <svg
-                    viewBox="0 0 540 360"
-                    preserveAspectRatio="none"
-                    className="absolute inset-0 w-full h-full"
-                    style={{
-                      backfaceVisibility: 'hidden',
-                      WebkitBackfaceVisibility: 'hidden',
-                      transform: 'rotateX(180deg)',
-                    }}
-                  >
-                    <BotanicalDefs id="flapInPat-anim" />
-                    <path d="M0,0 L270,230 L540,0 Z" fill="url(#flapInPat-anim)" />
-                    <path d="M0,0 L270,230 L540,0 Z" fill="rgba(180,130,90,0.07)" />
-                    <path d="M0,0 L270,230" fill="none" stroke={GOLD} strokeWidth="2" opacity="0.7" />
-                    <path d="M540,0 L270,230" fill="none" stroke={GOLD} strokeWidth="2" opacity="0.7" />
-                    <line x1="0" y1="1" x2="540" y2="1" stroke={GOLD} strokeWidth="1.2" opacity="0.45" />
-                  </svg>
-                </motion.div>
+                {/* INSIDE face — full botanical lining revealed when flap opens */}
+                <svg
+                  viewBox="0 0 540 360"
+                  preserveAspectRatio="none"
+                  className="absolute inset-0 w-full h-full"
+                  style={{
+                    backfaceVisibility: 'hidden',
+                    WebkitBackfaceVisibility: 'hidden',
+                    transform: 'rotateX(180deg)',
+                  }}
+                >
+                  <BotanicalDefs id="flapInPat-anim" />
+                  <path d="M0,0 L270,230 L540,0 Z" fill="url(#flapInPat-anim)" />
+                  <path d="M0,0 L270,230 L540,0 Z" fill="rgba(180,130,90,0.07)" />
+                  <path d="M0,0 L270,230" fill="none" stroke={GOLD} strokeWidth="2" opacity="0.7" />
+                  <path d="M540,0 L270,230" fill="none" stroke={GOLD} strokeWidth="2" opacity="0.7" />
+                  <line x1="0" y1="1" x2="540" y2="1" stroke={GOLD} strokeWidth="1.2" opacity="0.45" />
+                </svg>
               </motion.div>
               
               <motion.img
