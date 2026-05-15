@@ -23,7 +23,8 @@ function rotateSize(width, height, rotation) {
 export default async function getCroppedImg(
   imageSrc,
   pixelCrop,
-  rotation = 0
+  rotation = 0,
+  flip = { horizontal: false, vertical: false }
 ) {
   const image = await createImage(imageSrc);
   const canvas = document.createElement('canvas');
@@ -44,12 +45,13 @@ export default async function getCroppedImg(
   canvas.width = bBoxWidth;
   canvas.height = bBoxHeight;
 
-  // Translate canvas context to a central location to allow rotating around the center
+  // Translate canvas context to a central location to allow rotating and flipping around the center
   ctx.translate(bBoxWidth / 2, bBoxHeight / 2);
   ctx.rotate(rotRad);
+  ctx.scale(flip.horizontal ? -1 : 1, flip.vertical ? -1 : 1);
   ctx.translate(-image.width / 2, -image.height / 2);
 
-  // Draw rotated image
+  // Draw rotated & flipped image
   ctx.drawImage(image, 0, 0);
 
   const croppedCanvas = document.createElement('canvas');
