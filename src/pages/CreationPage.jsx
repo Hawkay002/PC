@@ -9,6 +9,60 @@ import Postcard from '../components/Postcard';
 import { createPostcard } from '../lib/supabase';
 import getCroppedImg from '../utils/cropImage';
 
+// ─── Constants & SVGs for Envelope consistency ─────────────────────────────
+const GOLD = '#C8A96E';
+const GOLD2 = '#E4CC8A';
+
+function BotanicalDefs({ id }) {
+  return (
+    <defs>
+      <pattern id={id} x="0" y="0" width="60" height="60" patternUnits="userSpaceOnUse">
+        {/* Cream base */}
+        <rect width="60" height="60" fill="#EDE5D0" />
+
+        {/* ── Central 8-petal flower ── */}
+        <ellipse cx="30" cy="22.5" rx="2.8" ry="5.5" fill="#C4826A" opacity="0.78" />
+        <ellipse cx="30" cy="37.5" rx="2.8" ry="5.5" fill="#C4826A" opacity="0.78" />
+        <ellipse cx="22.5" cy="30" rx="5.5" ry="2.8" fill="#C4826A" opacity="0.78" />
+        <ellipse cx="37.5" cy="30" rx="5.5" ry="2.8" fill="#C4826A" opacity="0.78" />
+        <ellipse cx="25" cy="25" rx="2.2" ry="4.5" transform="rotate(-45 25 25)" fill="#B86B50" opacity="0.6" />
+        <ellipse cx="35" cy="25" rx="2.2" ry="4.5" transform="rotate(45 35 25)" fill="#B86B50" opacity="0.6" />
+        <ellipse cx="25" cy="35" rx="2.2" ry="4.5" transform="rotate(45 25 35)" fill="#B86B50" opacity="0.6" />
+        <ellipse cx="35" cy="35" rx="2.2" ry="4.5" transform="rotate(-45 35 35)" fill="#B86B50" opacity="0.6" />
+        <circle cx="30" cy="30" r="4" fill="#C8A96E" opacity="0.95" />
+        <circle cx="30" cy="30" r="2.2" fill="#EDE5D0" />
+        <circle cx="30" cy="30" r="1" fill="#C8A96E" opacity="0.7" />
+
+        {/* ── Corner leaf sprigs ── */}
+        <path d="M3 6 Q6.5 2 9 7 Q4 10 3 6Z" fill="#6E9A5F" opacity="0.6" />
+        <path d="M6 3 Q10 6 7 9.5 Q3 7 6 3Z" fill="#7FAD6E" opacity="0.45" />
+        <path d="M57 6 Q53.5 2 51 7 Q56 10 57 6Z" fill="#6E9A5F" opacity="0.6" />
+        <path d="M54 3 Q50 6 53 9.5 Q57 7 54 3Z" fill="#7FAD6E" opacity="0.45" />
+        <path d="M3 54 Q6.5 58 9 53 Q4 50 3 54Z" fill="#6E9A5F" opacity="0.6" />
+        <path d="M6 57 Q10 54 7 50.5 Q3 53 6 57Z" fill="#7FAD6E" opacity="0.45" />
+        <path d="M57 54 Q53.5 58 51 53 Q56 50 57 54Z" fill="#6E9A5F" opacity="0.6" />
+        <path d="M54 57 Q50 54 53 50.5 Q57 53 54 57Z" fill="#7FAD6E" opacity="0.45" />
+
+        {/* ── Small buds at edge midpoints ── */}
+        <ellipse cx="30" cy="4" rx="2" ry="2.8" fill="#D4956A" opacity="0.55" />
+        <circle cx="30" cy="4" r="1" fill="#C8A96E" opacity="0.6" />
+        <ellipse cx="30" cy="56" rx="2" ry="2.8" fill="#D4956A" opacity="0.55" />
+        <circle cx="30" cy="56" r="1" fill="#C8A96E" opacity="0.6" />
+        <ellipse cx="4" cy="30" rx="2.8" ry="2" fill="#D4956A" opacity="0.55" />
+        <circle cx="4" cy="30" r="1" fill="#C8A96E" opacity="0.6" />
+        <ellipse cx="56" cy="30" rx="2.8" ry="2" fill="#D4956A" opacity="0.55" />
+        <circle cx="56" cy="30" r="1" fill="#C8A96E" opacity="0.6" />
+
+        {/* ── Gold dot accents ── */}
+        <circle cx="15" cy="15" r="1.4" fill="#C8A96E" opacity="0.38" />
+        <circle cx="45" cy="15" r="1.4" fill="#C8A96E" opacity="0.38" />
+        <circle cx="15" cy="45" r="1.4" fill="#C8A96E" opacity="0.38" />
+        <circle cx="45" cy="45" r="1.4" fill="#C8A96E" opacity="0.38" />
+      </pattern>
+    </defs>
+  );
+}
+
 const FLOWERS = [
   { id: 'anemone', name: 'Japanese Anemone', img: '/flowers/anemone.png' },
   { id: 'lily', name: 'Oriental Lily', img: '/flowers/lily.png' },
@@ -161,16 +215,13 @@ export default function CreationPage() {
       setGeneratedLink(`${window.location.origin}/card/${postcardId}`);
       setShowSealingAnim(true);
 
-      // --- TIMING FIX HERE ---
+      // Animation timings
       setTimeout(() => setPackStep(1), 100);
       setTimeout(() => setPackStep(2), 1200);
       setTimeout(() => setPackStep(3), 2000); // Postcard slides up
-      setTimeout(() => setPackStep(4), 2800);
-      // Postcard starts falling
-      setTimeout(() => setPackStep(5), 4500);
-      // Wait 1.7 seconds for card to settle!
-      setTimeout(() => setPackStep(6), 5300);
-      // Drop the wax seal
+      setTimeout(() => setPackStep(4), 2800); // Postcard drops in
+      setTimeout(() => setPackStep(5), 4500); // Top flap closes
+      setTimeout(() => setPackStep(6), 5300); // Wax seal drops
       
     } catch (error) {
       console.error(error);
@@ -557,53 +608,71 @@ export default function CreationPage() {
       </AnimatePresence>
 
       {/* Sealing animation overlay */}
-      {/* Sealing animation overlay */}
-<AnimatePresence>
-  {showSealingAnim && (
-    <motion.div
-      key="animation-overlay"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-obsidian p-4 overflow-hidden"
-    >
-      {/* Ambient glow */}
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(200,169,110,0.06)_0%,transparent_70%)] pointer-events-none" />
+      <AnimatePresence>
+        {showSealingAnim && (
+          <motion.div
+            key="animation-overlay"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-obsidian p-4 overflow-hidden"
+          >
+            {/* Ambient glow */}
+            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(200,169,110,0.06)_0%,transparent_70%)] pointer-events-none" />
 
-      {/* Close button */}
-      <button
-        onClick={() => {
-          setShowSealingAnim(false);
-          setPackStep(0);
-          setGeneratedLink('');
-          setCopied(false);
+            {/* Close button */}
+            <button
+              onClick={() => {
+                setShowSealingAnim(false);
+                setPackStep(0);
+                setGeneratedLink('');
+                setCopied(false);
 
-          // Reset form for new postcard
-          setCurrentStep(1);
-          setPreviewUrl('');
-          setImageFile(null);
-          setRawImageSrc(null);
+                // Reset form for new postcard
+                setCurrentStep(1);
+                setPreviewUrl('');
+                setImageFile(null);
+                setRawImageSrc(null);
 
-          setFormData({
-            to: '',
-            from: '',
-            message: '',
-            font: 'script',
-            decoration: FLOWERS[0].img,
-            stamp: STAMPS[0].img,
-            image_filter: ''
-          });
-        }}
-        className="absolute top-5 right-5 z-[120] w-11 h-11 flex items-center justify-center rounded-full border border-rim/60 bg-panel/80 backdrop-blur hover:border-gold/40 hover:bg-panel transition-all"
-      >
-        <X className="w-5 h-5 text-muted hover:text-champagne transition-colors" />
-      </button>
+                setFormData({
+                  to: '',
+                  from: '',
+                  message: '',
+                  font: 'script',
+                  decoration: FLOWERS[0].img,
+                  stamp: STAMPS[0].img,
+                  image_filter: ''
+                });
+              }}
+              className="absolute top-5 right-5 z-[120] w-11 h-11 flex items-center justify-center rounded-full border border-rim/60 bg-panel/80 backdrop-blur hover:border-gold/40 hover:bg-panel transition-all"
+            >
+              <X className="w-5 h-5 text-muted hover:text-champagne transition-colors" />
+            </button>
+            
             <div className="relative w-full max-w-lg aspect-[3/2] perspective-1000 mb-32">
+              
+              {/* ── ENVELOPE BODY — botanical inside lining ── */}
               <motion.div
-                className="absolute inset-0 bg-[#EAE5DC] shadow-envelope rounded-sm border border-ink/10"
+                className="absolute inset-0 shadow-envelope rounded-sm overflow-hidden"
                 initial={{ y: '-100vh', zIndex: 0 }}
                 animate={{ y: packStep >= 1 ? 0 : '-100vh' }}
                 transition={{ type: 'spring', stiffness: 40, damping: 15 }}
-              />
+              >
+                <div className="absolute inset-0 bg-[#EAE5DC]" />
+                <svg
+                  className="absolute inset-0 w-full h-full"
+                  viewBox="0 0 540 360"
+                  preserveAspectRatio="none"
+                >
+                  <BotanicalDefs id="bodyPat-anim" />
+                  <rect width="540" height="360" fill="url(#bodyPat-anim)" opacity="0.88" />
+                  <line x1="0" y1="0" x2="270" y2="220" stroke={GOLD} strokeWidth="1.2" opacity="0.35" />
+                  <line x1="540" y1="0" x2="270" y2="220" stroke={GOLD} strokeWidth="1.2" opacity="0.35" />
+                </svg>
+                <div
+                  className="absolute inset-0 pointer-events-none rounded-sm"
+                  style={{ boxShadow: `inset 0 0 0 1.5px rgba(200,169,110,0.4), inset 0 0 0 3.5px rgba(200,169,110,0.12)` }}
+                />
+              </motion.div>
               
               <motion.div
                 className="absolute inset-0 flex items-center justify-center z-10"
@@ -621,20 +690,29 @@ export default function CreationPage() {
                 </div>
               </motion.div>
               
+              {/* ── BOTTOM FLAP — outside face with gold borders ── */}
               <motion.div
-                className="absolute inset-0 z-20 pointer-events-none drop-shadow-sm"
+                className="absolute inset-0 w-full h-full z-20 pointer-events-none drop-shadow-sm"
                 initial={{ y: '-100vh' }}
                 animate={{ y: packStep >= 1 ? 0 : '-100vh' }}
                 transition={{ type: 'spring', stiffness: 40, damping: 15 }}
               >
                 <svg viewBox="0 0 540 360" preserveAspectRatio="none" className="w-full h-full rounded-b-sm overflow-hidden">
-                  <path d="M0,0 L270,220 L540,0 L540,360 L0,360 Z" fill="#F4F1EB" stroke="rgba(0,0,0,0.05)" strokeWidth="1" />
+                  <BotanicalDefs id="btmPat-anim" />
+                  <path d="M0,0 L270,220 L540,0 L540,360 L0,360 Z" fill="#F0EBE1" />
+                  <path d="M0,0 L270,220 L540,0 L540,360 L0,360 Z" fill="url(#btmPat-anim)" opacity="0.12" />
+                  <path d="M2,0 L270,218 L538,0" fill="none" stroke={GOLD2} strokeWidth="0.8" opacity="0.55" />
+                  <path d="M0,0 L270,220 L540,0" fill="none" stroke={GOLD} strokeWidth="2.2" opacity="0.85" />
+                  <path d="M14,0 L270,208 L526,0" fill="none" stroke={GOLD} strokeWidth="0.7" opacity="0.3" />
+                  <path d="M0,360 L270,222 L540,360" fill="none" stroke={GOLD} strokeWidth="1.2" opacity="0.28" />
+                  <rect x="1.5" y="1.5" width="537" height="357" fill="none" stroke={GOLD} strokeWidth="1.5" opacity="0.3" rx="1" />
                 </svg>
               </motion.div>
               
-              {/* --- Z-INDEX SNAPPING FIXED HERE --- */}
+              {/* ── TOP FLAP — outside + inside botanical revealed on open ── */}
               <motion.div
                 className="absolute top-0 left-0 w-full h-full origin-top drop-shadow-md"
+                style={{ transformStyle: 'preserve-3d' }}
                 initial={{ y: '-100vh', rotateX: 0, zIndex: 30 }}
                 animate={{
                   y: packStep >= 1 ? 0 : '-100vh',
@@ -644,12 +722,46 @@ export default function CreationPage() {
                 transition={{ 
                   duration: 0.8, 
                   ease: 'easeInOut',
-                  // Prevents Framer Motion from fading between 5 and 30
                   zIndex: { duration: 0 } 
                 }}
               >
-                <svg viewBox="0 0 540 360" preserveAspectRatio="none" className="w-full h-full rounded-t-sm">
-                  <path d="M0,0 L270,230 L540,0 Z" fill="#F4F1EB" stroke="rgba(0,0,0,0.08)" strokeWidth="1" />
+                {/* OUTSIDE face of top flap */}
+                <svg
+                  viewBox="0 0 540 360"
+                  preserveAspectRatio="none"
+                  className="absolute inset-0 w-full h-full rounded-t-sm"
+                  style={{ backfaceVisibility: 'hidden', WebkitBackfaceVisibility: 'hidden' }}
+                >
+                  <BotanicalDefs id="flapOutPat-anim" />
+                  <path d="M0,0 L270,230 L540,0 Z" fill="#F0EBE1" />
+                  <path d="M0,0 L270,230 L540,0 Z" fill="url(#flapOutPat-anim)" opacity="0.10" />
+                  <path d="M2,0 L270,228" fill="none" stroke={GOLD2} strokeWidth="0.9" opacity="0.6" />
+                  <path d="M0,0 L270,230" fill="none" stroke={GOLD} strokeWidth="2.8" opacity="0.88" />
+                  <path d="M538,0 L270,228" fill="none" stroke={GOLD2} strokeWidth="0.9" opacity="0.6" />
+                  <path d="M540,0 L270,230" fill="none" stroke={GOLD} strokeWidth="2.8" opacity="0.88" />
+                  <path d="M16,0 L270,216" fill="none" stroke={GOLD} strokeWidth="0.8" opacity="0.28" />
+                  <path d="M524,0 L270,216" fill="none" stroke={GOLD} strokeWidth="0.8" opacity="0.28" />
+                  <line x1="0" y1="1" x2="540" y2="1" stroke={GOLD} strokeWidth="1.8" opacity="0.45" />
+                  <line x1="0" y1="5" x2="540" y2="5" stroke={GOLD} strokeWidth="0.6" opacity="0.22" />
+                </svg>
+
+                {/* INSIDE face — full botanical lining revealed when flap opens */}
+                <svg
+                  viewBox="0 0 540 360"
+                  preserveAspectRatio="none"
+                  className="absolute inset-0 w-full h-full"
+                  style={{
+                    backfaceVisibility: 'hidden',
+                    WebkitBackfaceVisibility: 'hidden',
+                    transform: 'rotateX(180deg)',
+                  }}
+                >
+                  <BotanicalDefs id="flapInPat-anim" />
+                  <path d="M0,0 L270,230 L540,0 Z" fill="url(#flapInPat-anim)" />
+                  <path d="M0,0 L270,230 L540,0 Z" fill="rgba(180,130,90,0.07)" />
+                  <path d="M0,0 L270,230" fill="none" stroke={GOLD} strokeWidth="2" opacity="0.7" />
+                  <path d="M540,0 L270,230" fill="none" stroke={GOLD} strokeWidth="2" opacity="0.7" />
+                  <line x1="0" y1="1" x2="540" y2="1" stroke={GOLD} strokeWidth="1.2" opacity="0.45" />
                 </svg>
               </motion.div>
               
