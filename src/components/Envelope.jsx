@@ -128,6 +128,16 @@ export default function Envelope({ postcardData }) {
         >
           <div className="w-full relative">
             <Postcard data={postcardData} isInteractive={step >= 4} forceFlip={false} showShadow={false} />
+            
+            {/* ── NEW: Wax Seal 5 Overlay ── */}
+            <motion.img
+              src="/waxseal-5.webp"
+              alt="Broken Wax Seal Remnant"
+              className="absolute bottom-1 left-[22.5%] -translate-x-1/2 w-12 h-12 sm:w-14 sm:h-14 object-contain z-20 pointer-events-none drop-shadow-md"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: step >= 4 ? 1 : 0 }}
+              transition={{ duration: 0.5, delay: 0.2, ease: 'easeIn' }}
+            />
           </div>
         </motion.div>
 
