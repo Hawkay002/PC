@@ -9,6 +9,14 @@ import Postcard from '../components/Postcard';
 import { createPostcard } from '../lib/supabase';
 import getCroppedImg from '../utils/cropImage';
 
+import { HugeiconsIcon } from "@hugeicons/react";
+import { 
+  OrientationImageLandscapeToPotraitIcon, 
+  OrientationImagePotraitToLandscapeIcon, 
+  FlipHorizontalIcon, 
+  FlipVerticalIcon 
+} from "@hugeicons/core-free-icons";
+
 // ─── Constants & SVGs for Envelope consistency ─────────────────────────────
 const GOLD = '#C8A96E';
 const GOLD2 = '#E4CC8A';
@@ -157,6 +165,7 @@ export default function CreationPage() {
   const [crop, setCrop] = useState({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(1);
   const [rotation, setRotation] = useState(0);
+  const [flip, setFlip] = useState({ horizontal: false, vertical: false });
   const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
 
   const onCropComplete = useCallback((_, cap) => setCroppedAreaPixels(cap), []);
@@ -170,11 +179,13 @@ export default function CreationPage() {
 
   const handleSaveCrop = async () => {
     try {
-      const croppedImageFile = await getCroppedImg(rawImageSrc, croppedAreaPixels, rotation);
+      // Pass the flip state to correctly process the flipped crop mathematically
+      const croppedImageFile = await getCroppedImg(rawImageSrc, croppedAreaPixels, rotation, flip);
       setPreviewUrl(URL.createObjectURL(croppedImageFile));
       setImageFile(croppedImageFile);
       setRawImageSrc(null);
       setRotation(0);
+      setFlip({ horizontal: false, vertical: false });
     } catch (e) {
       console.error(e);
     }
@@ -582,7 +593,7 @@ export default function CreationPage() {
             <div className="bg-panel border border-rim rounded-sm w-full max-w-2xl overflow-hidden flex flex-col h-[80vh]">
               <div className="p-4 border-b border-rim flex justify-between items-center">
                 <h3 className="font-display text-xl font-light italic text-luminary">Frame your photo</h3>
-                <button onClick={() => { setRawImageSrc(null); setRotation(0); }} className="text-muted hover:text-luminary text-sm font-sans transition-colors">
+                <button onClick={() => { setRawImageSrc(null); setRotation(0); setFlip({ horizontal: false, vertical: false }); }} className="text-muted hover:text-luminary text-sm font-sans transition-colors">
                   Cancel
                 </button>
               </div>
@@ -597,22 +608,60 @@ export default function CreationPage() {
                   onCropComplete={onCropComplete}
                   onZoomChange={setZoom}
                   onRotationChange={setRotation}
+                  style={{
+                    mediaStyle: {
+                      scale: `${flip.horizontal ? -1 : 1} ${flip.vertical ? -1 : 1}`
+                    }
+                  }}
                 />
               </div>
+              
               <div className="p-5 border-t border-rim flex flex-col sm:flex-row gap-4 justify-between items-center bg-charcoal/30">
-                <div className="flex items-center gap-3 w-full sm:w-auto">
-                  <span className="text-xs font-sans uppercase tracking-[0.15em] text-muted">Rotate</span>
-                  <input
-                    type="range"
-                    value={rotation}
-                    min={0}
-                    max={360}
-                    step={1}
-                    onChange={(e) => setRotation(Number(e.target.value))}
-                    className="w-full sm:w-48 h-1 bg-rim rounded-lg appearance-none cursor-pointer accent-gold"
-                  />
-                  <span className="text-xs font-sans text-muted w-8 text-right">{rotation}°</span>
+                {/* ── NEW: Interactive Hugeicons Toolbar ── */}
+                <div className="flex items-center gap-2 w-full sm:w-auto">
+                  <button
+                    type="button"
+                    onClick={() => setRotation(r => r - 90)}
+                    className="w-10 h-10 flex items-center justify-center bg-charcoal hover:bg-surface border border-rim rounded-sm text-muted hover:text-champagne transition-colors"
+                    title="Rotate 90° CCW"
+                  >
+                    <HugeiconsIcon icon={OrientationImageLandscapeToPotraitIcon} size={20} />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setRotation(r => r + 90)}
+                    className="w-10 h-10 flex items-center justify-center bg-charcoal hover:bg-surface border border-rim rounded-sm text-muted hover:text-champagne transition-colors"
+                    title="Rotate 90° CW"
+                  >
+                    <HugeiconsIcon icon={OrientationImagePotraitToLandscapeIcon} size={20} />
+                  </button>
+                  
+                  <div className="w-px h-6 bg-rim mx-1" />
+                  
+                  <button
+                    type="button"
+                    onClick={() => setFlip(f => ({ ...f, horizontal: !f.horizontal }))}
+                    className={clsx(
+                      "w-10 h-10 flex items-center justify-center border rounded-sm transition-colors", 
+                      flip.horizontal ? "bg-gold/10 border-gold/50 text-champagne" : "bg-charcoal hover:bg-surface border-rim text-muted hover:text-champagne"
+                    )}
+                    title="Flip Horizontal"
+                  >
+                    <HugeiconsIcon icon={FlipHorizontalIcon} size={20} />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setFlip(f => ({ ...f, vertical: !f.vertical }))}
+                    className={clsx(
+                      "w-10 h-10 flex items-center justify-center border rounded-sm transition-colors", 
+                      flip.vertical ? "bg-gold/10 border-gold/50 text-champagne" : "bg-charcoal hover:bg-surface border-rim text-muted hover:text-champagne"
+                    )}
+                    title="Flip Vertical"
+                  >
+                    <HugeiconsIcon icon={FlipVerticalIcon} size={20} />
+                  </button>
                 </div>
+
                 <button
                   onClick={handleSaveCrop}
                   className="w-full sm:w-auto bg-gradient-to-r from-gold/90 to-champagne/80 text-obsidian px-8 py-2.5 rounded-sm font-sans font-medium text-sm hover:from-gold hover:to-champagne transition-all"
@@ -620,6 +669,7 @@ export default function CreationPage() {
                   Apply
                 </button>
               </div>
+
             </div>
           </motion.div>
         )}
@@ -651,6 +701,7 @@ export default function CreationPage() {
                 setImageFile(null);
                 setRawImageSrc(null);
                 setRotation(0);
+                setFlip({ horizontal: false, vertical: false });
 
                 setFormData({
                   to: '',
