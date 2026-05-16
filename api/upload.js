@@ -36,8 +36,11 @@ export default async function handler(req, res) {
     const photoArray = data.result.photo;
     const bestPhoto = photoArray[photoArray.length - 1];
 
-    // Return the ID to be saved in your Firebase database
-    return res.status(200).json({ file_id: bestPhoto.file_id });
+    // Return the file_id (for image display) and message_id (for future deletion)
+    return res.status(200).json({
+      file_id: bestPhoto.file_id,
+      message_id: data.result.message_id,
+    });
 
   } catch (error) {
     console.error('Upload Error:', error);
