@@ -4,6 +4,8 @@ import CreationPage from './pages/CreationPage';
 import SharedPostcard from './pages/SharedPostcard';
 import Dashboard from './pages/Dashboard';
 import NotFound from './pages/NotFound';
+import PrivacyPolicy from './pages/PrivacyPolicy';
+import TermsOfService from './pages/TermsOfService';
 
 function App() {
   return (
@@ -14,6 +16,8 @@ function App() {
           <Route path="/create" element={<CreationPage />} />
           <Route path="/card/:id" element={<SharedPostcard />} />
           <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/privacy" element={<PrivacyPolicy />} />
+          <Route path="/terms" element={<TermsOfService />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </div>
