@@ -95,12 +95,12 @@ function PostcardCard({ card, onConfirmDelete, deletingId }) {
           <UuidStrip id={card.id} />
         </div>
 
-        {/* Action buttons */}
+        {/* Action buttons — Link + Open, both h-8 to match */}
         <div className="flex items-center gap-1.5 shrink-0 mt-0.5">
           <button
             onClick={handleCopyLink}
             title="Copy shareable link"
-            className="flex items-center gap-1.5 text-xs font-sans text-muted hover:text-champagne px-2.5 py-1.5 border border-rim hover:border-gold/30 rounded-sm transition-all"
+            className="h-8 flex items-center gap-1.5 text-xs font-sans text-muted hover:text-champagne px-2.5 border border-rim hover:border-gold/30 rounded-sm transition-all"
           >
             {copiedLink
               ? <><Check className="w-3 h-3 text-gold" /><span>Copied</span></>
@@ -110,21 +110,10 @@ function PostcardCard({ card, onConfirmDelete, deletingId }) {
           <Link
             to={`/card/${card.id}`}
             title="Open postcard"
-            className="w-8 h-8 flex items-center justify-center text-muted hover:text-gold border border-rim hover:border-gold/30 rounded-sm transition-all"
+            className="h-8 w-8 flex items-center justify-center text-muted hover:text-gold border border-rim hover:border-gold/30 rounded-sm transition-all"
           >
             <ExternalLink className="w-3.5 h-3.5" />
           </Link>
-
-          <button
-            onClick={() => onConfirmDelete(card.id)}
-            disabled={deletingId === card.id}
-            title="Delete postcard"
-            className="w-8 h-8 flex items-center justify-center text-muted hover:text-red-400/80 hover:bg-red-500/10 rounded-sm transition-all disabled:opacity-30"
-          >
-            {deletingId === card.id
-              ? <span className="w-3.5 h-3.5 border border-muted/30 border-t-muted/70 rounded-full animate-spin block" />
-              : <Trash2 className="w-3.5 h-3.5" />}
-          </button>
         </div>
       </div>
 
@@ -146,9 +135,23 @@ function PostcardCard({ card, onConfirmDelete, deletingId }) {
         />
       </div>
 
-      <p className="text-center text-xs font-sans text-muted/40 italic mt-2 select-none">
-        Click postcard to flip
-      </p>
+      {/* ── Below postcard: flip hint left, delete right ── */}
+      <div className="flex items-center justify-between mt-2">
+        <p className="text-xs font-sans text-muted/40 italic select-none">
+          Click postcard to flip
+        </p>
+        <button
+          onClick={() => onConfirmDelete(card.id)}
+          disabled={deletingId === card.id}
+          title="Delete postcard"
+          className="flex items-center gap-1.5 h-7 px-2.5 text-xs font-sans text-muted/50 hover:text-red-400/80 hover:bg-red-500/10 border border-rim/40 hover:border-red-500/30 rounded-sm transition-all disabled:opacity-30"
+        >
+          {deletingId === card.id
+            ? <span className="w-3 h-3 border border-muted/30 border-t-muted/70 rounded-full animate-spin block" />
+            : <Trash2 className="w-3 h-3" />}
+          <span>Delete</span>
+        </button>
+      </div>
     </motion.div>
   );
 }
