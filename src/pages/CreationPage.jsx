@@ -266,6 +266,13 @@ export default function CreationPage() {
       savedCards.push({
         id: postcardId,
         to: formData.to,
+        from: formData.from,
+        message: formData.message,
+        decoration: formData.decoration,
+        stamp: formData.stamp,
+        image_filter: formData.image_filter,
+        file_id: uploadData.file_id ?? null,
+        previewUrl: previewUrl ?? null,
         date: new Date().toISOString(),
         message_id: uploadData.message_id ?? null,
       });
