@@ -559,6 +559,21 @@ export default function LandingPage() {
             </a>
           </p>
           <p className="text-[10px] font-sans text-muted/40 italic">© 2026 Correspondance · Made with care</p>
+          <div className="flex items-center gap-5 mt-1">
+            <Link
+              to="/privacy"
+              className="text-[10px] font-sans text-muted/40 hover:text-gold/70 transition-colors tracking-wide"
+            >
+              Privacy Policy
+            </Link>
+            <span className="text-muted/20 text-[10px]">·</span>
+            <Link
+              to="/terms"
+              className="text-[10px] font-sans text-muted/40 hover:text-gold/70 transition-colors tracking-wide"
+            >
+              Terms of Service
+            </Link>
+          </div>
         </div>
       </footer>
 
