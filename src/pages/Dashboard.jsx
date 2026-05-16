@@ -28,6 +28,7 @@ export default function Dashboard() {
   const [deletingId, setDeletingId] = useState(null);
   const [confirmId, setConfirmId] = useState(null); // which card is pending delete
   const [copied, setCopied] = useState(null);
+  const [copiedUuid, setCopiedUuid] = useState(null);
 
   useEffect(() => {
     const saved = JSON.parse(localStorage.getItem('my_postcards') || '[]');
@@ -57,6 +58,12 @@ export default function Dashboard() {
     navigator.clipboard.writeText(`${window.location.origin}/card/${id}`);
     setCopied(id);
     setTimeout(() => setCopied(null), 2000);
+  };
+
+  const handleCopyUuid = (id) => {
+    navigator.clipboard.writeText(id);
+    setCopiedUuid(id);
+    setTimeout(() => setCopiedUuid(null), 2000);
   };
 
   return (
@@ -118,6 +125,21 @@ export default function Dashboard() {
                       <div className="flex items-center gap-1.5 text-xs text-muted mt-0.5 font-sans">
                         <Clock className="w-3 h-3" />
                         <span>{new Date(card.date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</span>
+                      </div>
+                      {/* Supabase UUID for admin lookup */}
+                      <div className="flex items-center gap-1.5 mt-1.5">
+                        <span className="font-mono text-[10px] text-muted/50 tracking-tight select-all">{card.id}</span>
+                        <button
+                          onClick={() => handleCopyUuid(card.id)}
+                          title="Copy UUID"
+                          className="flex items-center justify-center w-4 h-4 rounded-sm text-muted/40 hover:text-gold/70 hover:bg-gold/10 transition-all shrink-0"
+                        >
+                          {copiedUuid === card.id ? (
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="w-2.5 h-2.5 text-gold/70"><polyline points="20 6 9 17 4 12"/></svg>
+                          ) : (
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-2.5 h-2.5"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                          )}
+                        </button>
                       </div>
                     </div>
                   </div>
