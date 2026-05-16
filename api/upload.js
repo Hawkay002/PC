@@ -36,6 +36,17 @@ export default async function handler(req, res) {
     const photoArray = data.result.photo;
     const bestPhoto = photoArray[photoArray.length - 1];
 
+    // Add the file_id as the message caption so it's easy to cross-reference
+    await fetch(`https://api.telegram.org/bot${botToken}/editMessageCaption`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        chat_id: chatId,
+        message_id: data.result.message_id,
+        caption: `file_id: ${bestPhoto.file_id}`,
+      }),
+    });
+
     // Return the file_id (for image display) and message_id (for future deletion)
     return res.status(200).json({
       file_id: bestPhoto.file_id,
