@@ -202,7 +202,7 @@ function TermsSection({ section, index }) {
       className="mb-14"
     >
       <div className="flex items-start gap-4 mb-5">
-        <span className="font-display text-xs text-gold/40 tracking-[0.2em] mt-1.5 shrink-0">{section.id}</span>
+        <span className="font-display text-2xl lg:text-3xl font-light text-gold/40 shrink-0">{section.id}.</span>
         <h2 className="font-display text-2xl lg:text-3xl font-light text-luminary leading-snug">
           {section.title}
         </h2>
