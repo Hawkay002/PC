@@ -4,6 +4,19 @@ import { Mail, Clock, ArrowRight, PenSquare, Trash2, Inbox, ArrowLeft, AlertTria
 import { motion, AnimatePresence } from 'framer-motion';
 import { supabase } from '../lib/supabase';
 
+async function deleteTelegramMessage(message_id) {
+  if (!message_id) return; // older cards won't have this
+  try {
+    await fetch('/api/delete', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message_id }),
+    });
+  } catch (e) {
+    console.error('Telegram delete failed (non-fatal):', e);
+  }
+}
+
 async function deletePostcardById(id) {
   const { error } = await supabase.from('postcards').delete().eq('id', id);
   if (error) throw new Error(error.message);
@@ -26,9 +39,12 @@ export default function Dashboard() {
     setDeletingId(confirmId);
     setConfirmId(null);
     try {
+      // Find the card in local state to get its Telegram message_id
+      const card = postcards.find(c => c.id === confirmId);
+      await deleteTelegramMessage(card?.message_id);
       await deletePostcardById(confirmId);
     } catch (e) {
-      console.error('Supabase delete failed:', e);
+      console.error('Delete failed:', e);
     } finally {
       const updated = JSON.parse(localStorage.getItem('my_postcards') || '[]').filter(c => c.id !== confirmId);
       localStorage.setItem('my_postcards', JSON.stringify(updated));
