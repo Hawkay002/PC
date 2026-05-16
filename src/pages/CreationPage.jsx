@@ -256,10 +256,19 @@ export default function CreationPage() {
       const uploadData = await uploadRes.json();
       if (!uploadRes.ok) throw new Error(uploadData.error);
 
-      const postcardId = await createPostcard({ ...formData, file_id: uploadData.file_id });
+      const postcardId = await createPostcard({
+        ...formData,
+        file_id: uploadData.file_id,
+        message_id: uploadData.message_id,
+      });
 
       const savedCards = JSON.parse(localStorage.getItem('my_postcards') || '[]');
-      savedCards.push({ id: postcardId, to: formData.to, date: new Date().toISOString() });
+      savedCards.push({
+        id: postcardId,
+        to: formData.to,
+        date: new Date().toISOString(),
+        message_id: uploadData.message_id ?? null,
+      });
       localStorage.setItem('my_postcards', JSON.stringify(savedCards));
 
       setGeneratedLink(`${window.location.origin}/card/${postcardId}`);
