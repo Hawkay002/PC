@@ -6,10 +6,12 @@ import Dashboard from './pages/Dashboard';
 import NotFound from './pages/NotFound';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import TermsOfService from './pages/TermsOfService';
+import ScrollToTop from './components/ScrollToTop';
 
 function App() {
   return (
     <Router>
+      <ScrollToTop />
       <div className="min-h-screen bg-obsidian font-sans text-luminary">
         <Routes>
           <Route path="/" element={<LandingPage />} />
