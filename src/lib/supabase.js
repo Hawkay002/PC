@@ -22,7 +22,8 @@ export async function createPostcard(postcardData) {
         font: postcardData.font || 'script',
         decoration: postcardData.decoration,
         stamp: postcardData.stamp,
-        file_id: postcardData.file_id, 
+        file_id: postcardData.file_id,
+        message_id: postcardData.message_id ?? null,
         image_filter: postcardData.image_filter || 'none',
       }
     ])
